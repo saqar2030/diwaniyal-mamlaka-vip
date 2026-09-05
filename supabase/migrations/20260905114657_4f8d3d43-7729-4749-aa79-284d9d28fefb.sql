@@ -1,0 +1,8 @@
+
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+revoke execute on function public.create_room_seats() from public, anon, authenticated;
+revoke execute on function public.update_updated_at_column() from public, anon, authenticated;
+revoke execute on function public.has_role(uuid, public.app_role) from public, anon;
+revoke execute on function public.send_gift(uuid, uuid, uuid) from public, anon;
+grant execute on function public.has_role(uuid, public.app_role) to authenticated;
+grant execute on function public.send_gift(uuid, uuid, uuid) to authenticated;
