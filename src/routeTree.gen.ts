@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as FamiliesRouteImport } from './routes/families'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
+import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedRoomRoomIdRouteImport } from './routes/_authenticated/room.$roomId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -46,6 +47,11 @@ const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
   path: '/me',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRoomRoomIdRoute = AuthenticatedRoomRoomIdRouteImport.update({
   id: '/room/$roomId',
   path: '/room/$roomId',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/families': typeof FamiliesRoute
   '/feed': typeof FeedRoute
   '/me': typeof AuthenticatedMeRoute
+  '/messages': typeof AuthenticatedMessagesRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
 }
 export interface FileRoutesByTo {
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/families': typeof FamiliesRoute
   '/feed': typeof FeedRoute
   '/me': typeof AuthenticatedMeRoute
+  '/messages': typeof AuthenticatedMessagesRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
 }
 export interface FileRoutesById {
@@ -76,13 +84,28 @@ export interface FileRoutesById {
   '/families': typeof FamiliesRoute
   '/feed': typeof FeedRoute
   '/_authenticated/me': typeof AuthenticatedMeRoute
+  '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/families' | '/feed' | '/me' | '/room/$roomId'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/families'
+    | '/feed'
+    | '/me'
+    | '/messages'
+    | '/room/$roomId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/families' | '/feed' | '/me' | '/room/$roomId'
+  to:
+    | '/'
+    | '/auth'
+    | '/families'
+    | '/feed'
+    | '/me'
+    | '/messages'
+    | '/room/$roomId'
   id:
     | '__root__'
     | '/'
@@ -91,6 +114,7 @@ export interface FileRouteTypes {
     | '/families'
     | '/feed'
     | '/_authenticated/me'
+    | '/_authenticated/messages'
     | '/_authenticated/room/$roomId'
   fileRoutesById: FileRoutesById
 }
@@ -146,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/messages': {
+      id: '/_authenticated/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/room/$roomId': {
       id: '/_authenticated/room/$roomId'
       path: '/room/$roomId'
@@ -158,11 +189,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMeRoute: typeof AuthenticatedMeRoute
+  AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedRoomRoomIdRoute: typeof AuthenticatedRoomRoomIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMeRoute: AuthenticatedMeRoute,
+  AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedRoomRoomIdRoute: AuthenticatedRoomRoomIdRoute,
 }
 
