@@ -14,18 +14,121 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      coin_packages: {
+        Row: {
+          coins: number
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          price_sar: number
+          sort_order: number
+        }
+        Insert: {
+          coins: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          price_sar: number
+          sort_order?: number
+        }
+        Update: {
+          coins?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_sar?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      coin_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          kind: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      couples: {
+        Row: {
+          created_at: string
+          id: string
+          points: number
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points?: number
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points?: number
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
+      }
       direct_messages: {
         Row: {
           content: string
           created_at: string
           id: string
+          kind: string
+          media_url: string | null
           receiver_id: string
           sender_id: string
         }
         Insert: {
-          content: string
+          content?: string
           created_at?: string
           id?: string
+          kind?: string
+          media_url?: string | null
           receiver_id: string
           sender_id: string
         }
@@ -33,6 +136,8 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          kind?: string
+          media_url?: string | null
           receiver_id?: string
           sender_id?: string
         }
@@ -40,28 +145,37 @@ export type Database = {
       }
       families: {
         Row: {
+          banner_animated: boolean
           banner_url: string | null
           created_at: string
           description: string | null
           id: string
+          is_private: boolean
           name: string
           owner_id: string
+          requires_approval: boolean
         }
         Insert: {
+          banner_animated?: boolean
           banner_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          is_private?: boolean
           name: string
           owner_id: string
+          requires_approval?: boolean
         }
         Update: {
+          banner_animated?: boolean
           banner_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          is_private?: boolean
           name?: string
           owner_id?: string
+          requires_approval?: boolean
         }
         Relationships: []
       }
@@ -69,21 +183,65 @@ export type Database = {
         Row: {
           family_id: string
           joined_at: string
+          role: string
+          status: string
           user_id: string
         }
         Insert: {
           family_id: string
           joined_at?: string
+          role?: string
+          status?: string
           user_id: string
         }
         Update: {
           family_id?: string
           joined_at?: string
+          role?: string
+          status?: string
           user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_messages: {
+        Row: {
+          content: string
+          created_at: string
+          family_id: string
+          id: string
+          kind: string
+          media_url: string | null
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          family_id: string
+          id?: string
+          kind?: string
+          media_url?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          family_id?: string
+          id?: string
+          kind?: string
+          media_url?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_messages_family_id_fkey"
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
@@ -239,6 +397,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string | null
+          is_hidden: boolean
           user_id: string
         }
         Insert: {
@@ -246,6 +405,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          is_hidden?: boolean
           user_id: string
         }
         Update: {
@@ -253,6 +413,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          is_hidden?: boolean
           user_id?: string
         }
         Relationships: []
@@ -268,6 +429,8 @@ export type Database = {
           gifts_received: number
           gifts_sent: number
           id: string
+          is_banned: boolean
+          last_seen_at: string
           level: number
           name_color: string | null
           updated_at: string
@@ -283,6 +446,8 @@ export type Database = {
           gifts_received?: number
           gifts_sent?: number
           id: string
+          is_banned?: boolean
+          last_seen_at?: string
           level?: number
           name_color?: string | null
           updated_at?: string
@@ -298,12 +463,49 @@ export type Database = {
           gifts_received?: number
           gifts_sent?: number
           id?: string
+          is_banned?: boolean
+          last_seen_at?: string
           level?: number
           name_color?: string | null
           updated_at?: string
           username?: string
         }
         Relationships: []
+      }
+      room_bans: {
+        Row: {
+          banned_by: string | null
+          created_at: string
+          id: string
+          reason: string | null
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          banned_by?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          banned_by?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_bans_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       room_messages: {
         Row: {
@@ -333,6 +535,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "room_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["room_role"]
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["room_role"]
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["room_role"]
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_roles_room_id_fkey"
             columns: ["room_id"]
             isOneToOne: false
             referencedRelation: "rooms"
@@ -380,6 +614,9 @@ export type Database = {
       }
       rooms: {
         Row: {
+          background_url: string | null
+          banner_animated: boolean
+          banner_url: string | null
           cover_url: string | null
           created_at: string
           description: string | null
@@ -389,8 +626,12 @@ export type Database = {
           owner_id: string
           room_pin: string | null
           seat_count: number
+          welcome_message: string | null
         }
         Insert: {
+          background_url?: string | null
+          banner_animated?: boolean
+          banner_url?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
@@ -400,8 +641,12 @@ export type Database = {
           owner_id: string
           room_pin?: string | null
           seat_count?: number
+          welcome_message?: string | null
         }
         Update: {
+          background_url?: string | null
+          banner_animated?: boolean
+          banner_url?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
@@ -411,6 +656,7 @@ export type Database = {
           owner_id?: string
           room_pin?: string | null
           seat_count?: number
+          welcome_message?: string | null
         }
         Relationships: []
       }
@@ -444,6 +690,22 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_family_member: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_family_owner: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_room_owner: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_room_staff: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
       send_gift: {
         Args: { _gift_id: string; _receiver_id: string; _room_id: string }
         Returns: {
@@ -462,9 +724,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_super_pin: { Args: { _new: string; _old: string }; Returns: boolean }
+      topup_coins: { Args: { _package_id: string }; Returns: number }
+      touch_presence: { Args: never; Returns: undefined }
+      verify_super_pin: { Args: { _pin: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      room_role: "admin" | "moderator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -593,6 +860,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      room_role: ["admin", "moderator"],
     },
   },
 } as const
