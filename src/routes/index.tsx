@@ -36,13 +36,13 @@ function HomePage() {
 
   async function createRoom() {
     if (!user) return navigate({ to: "/auth" });
-    if (!name.trim()) return toast.error("اكتب اسم الغرفة");
+    if (!name.trim()) { toast.error("اكتب اسم الغرفة"); return; }
     const { data, error } = await supabase
       .from("rooms")
       .insert({ name: name.trim(), description: desc.trim(), owner_id: user.id })
       .select()
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setCreating(false);
     setName("");
     setDesc("");
