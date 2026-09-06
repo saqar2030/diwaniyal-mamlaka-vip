@@ -38,16 +38,16 @@ function FeedPage() {
   });
 
   async function publish() {
-    if (!user) return toast.error("سجّل دخولك أولاً");
+    if (!user) { toast.error("سجّل دخولك أولاً"); return; }
     if (!content.trim()) return;
     const { error } = await supabase.from("posts").insert({ user_id: user.id, content: content.trim() });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setContent("");
     qc.invalidateQueries({ queryKey: ["posts"] });
   }
 
   async function toggleLike(postId: string, liked: boolean) {
-    if (!user) return toast.error("سجّل دخولك أولاً");
+    if (!user) { toast.error("سجّل دخولك أولاً"); return; }
     if (liked) await supabase.from("post_likes").delete().eq("post_id", postId).eq("user_id", user.id);
     else await supabase.from("post_likes").insert({ post_id: postId, user_id: user.id });
     qc.invalidateQueries({ queryKey: ["posts"] });

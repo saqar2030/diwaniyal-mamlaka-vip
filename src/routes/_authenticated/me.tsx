@@ -40,7 +40,7 @@ function MePage() {
       .from("profiles")
       .update({ username, bio, avatar_url: avatar || null })
       .eq("id", user.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("تم حفظ ملفك");
     qc.invalidateQueries({ queryKey: ["profile", user.id] });
   }

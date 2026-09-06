@@ -44,7 +44,7 @@ function ProfilePage() {
   const isFollowing = followers.some((f) => f.follower_id === user?.id);
 
   async function toggleFollow() {
-    if (!user) return toast.error("سجّل دخولك أولاً");
+    if (!user) { toast.error("سجّل دخولك أولاً"); return; }
     if (user.id === userId) return;
     if (isFollowing)
       await supabase.from("follows").delete().eq("follower_id", user.id).eq("following_id", userId);

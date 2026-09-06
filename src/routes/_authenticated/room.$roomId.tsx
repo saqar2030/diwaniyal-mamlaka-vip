@@ -123,8 +123,8 @@ function RoomPage() {
 
   async function takeSeat(seat: Seat) {
     if (!user) return;
-    if (seat.user_id && seat.user_id !== user.id) return toast.error("المقعد مشغول");
-    if (seat.is_locked) return toast.error("المقعد مقفل");
+    if (seat.user_id && seat.user_id !== user.id) { toast.error("المقعد مشغول"); return; }
+    if (seat.is_locked) { toast.error("المقعد مقفل"); return; }
     if (seat.user_id === user.id) {
       await supabase.from("room_seats").update({ user_id: null }).eq("id", seat.id);
     } else {
@@ -157,7 +157,7 @@ function RoomPage() {
       _receiver_id: giftFor,
       _room_id: roomId,
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setGiftFor(null);
     toast.success("تم إرسال الهدية 🎁");
     qc.invalidateQueries({ queryKey: ["seat-profiles"] });

@@ -39,14 +39,14 @@ function FamiliesPage() {
   });
 
   async function create() {
-    if (!user) return toast.error("سجّل دخولك أولاً");
-    if (!name.trim()) return toast.error("اكتب اسم القروب");
+    if (!user) { toast.error("سجّل دخولك أولاً"); return; }
+    if (!name.trim()) { toast.error("اكتب اسم القروب"); return; }
     const { data, error } = await supabase
       .from("families")
       .insert({ name: name.trim(), description: desc.trim(), owner_id: user.id })
       .select()
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     await supabase.from("family_members").insert({ family_id: data.id, user_id: user.id });
     setOpen(false);
     setName("");
@@ -55,7 +55,7 @@ function FamiliesPage() {
   }
 
   async function toggleJoin(familyId: string, isMember: boolean) {
-    if (!user) return toast.error("سجّل دخولك أولاً");
+    if (!user) { toast.error("سجّل دخولك أولاً"); return; }
     if (isMember) await supabase.from("family_members").delete().eq("family_id", familyId).eq("user_id", user.id);
     else await supabase.from("family_members").insert({ family_id: familyId, user_id: user.id });
     qc.invalidateQueries({ queryKey: ["families"] });
