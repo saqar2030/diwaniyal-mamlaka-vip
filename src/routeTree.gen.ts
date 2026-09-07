@@ -14,8 +14,12 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as FamiliesRouteImport } from './routes/families'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
+import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as AuthenticatedRoomRoomIdRouteImport } from './routes/_authenticated/room.$roomId'
 
@@ -43,6 +47,21 @@ const FeedRoute = FeedRouteImport.update({
   path: '/feed',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
   id: '/me',
   path: '/me',
@@ -51,6 +70,11 @@ const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
 const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ProfileUserIdRoute = ProfileUserIdRouteImport.update({
@@ -69,8 +93,12 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/families': typeof FamiliesRoute
   '/feed': typeof FeedRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/search': typeof SearchRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/me': typeof AuthenticatedMeRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
 }
@@ -79,8 +107,12 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/families': typeof FamiliesRoute
   '/feed': typeof FeedRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/search': typeof SearchRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/me': typeof AuthenticatedMeRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
 }
@@ -91,8 +123,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/families': typeof FamiliesRoute
   '/feed': typeof FeedRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/search': typeof SearchRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/me': typeof AuthenticatedMeRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
+  '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/_authenticated/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
 }
@@ -103,8 +139,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/families'
     | '/feed'
+    | '/leaderboard'
+    | '/search'
+    | '/admin'
     | '/me'
     | '/messages'
+    | '/wallet'
     | '/profile/$userId'
     | '/room/$roomId'
   fileRoutesByTo: FileRoutesByTo
@@ -113,8 +153,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/families'
     | '/feed'
+    | '/leaderboard'
+    | '/search'
+    | '/admin'
     | '/me'
     | '/messages'
+    | '/wallet'
     | '/profile/$userId'
     | '/room/$roomId'
   id:
@@ -124,8 +168,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/families'
     | '/feed'
+    | '/leaderboard'
+    | '/search'
+    | '/_authenticated/admin'
     | '/_authenticated/me'
     | '/_authenticated/messages'
+    | '/_authenticated/wallet'
     | '/profile/$userId'
     | '/_authenticated/room/$roomId'
   fileRoutesById: FileRoutesById
@@ -136,6 +184,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   FamiliesRoute: typeof FamiliesRoute
   FeedRoute: typeof FeedRoute
+  LeaderboardRoute: typeof LeaderboardRoute
+  SearchRoute: typeof SearchRoute
   ProfileUserIdRoute: typeof ProfileUserIdRoute
 }
 
@@ -176,6 +226,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/me': {
       id: '/_authenticated/me'
       path: '/me'
@@ -188,6 +259,13 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/messages'
       preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/wallet': {
+      id: '/_authenticated/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AuthenticatedWalletRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/profile/$userId': {
@@ -208,14 +286,18 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedMeRoute: typeof AuthenticatedMeRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedRoomRoomIdRoute: typeof AuthenticatedRoomRoomIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedMeRoute: AuthenticatedMeRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedRoomRoomIdRoute: AuthenticatedRoomRoomIdRoute,
 }
 
@@ -228,6 +310,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   FamiliesRoute: FamiliesRoute,
   FeedRoute: FeedRoute,
+  LeaderboardRoute: LeaderboardRoute,
+  SearchRoute: SearchRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
 }
 export const routeTree = rootRouteImport
