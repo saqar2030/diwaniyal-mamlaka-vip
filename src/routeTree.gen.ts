@@ -21,6 +21,7 @@ import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
+import { Route as AuthenticatedFamilyFamilyIdRouteImport } from './routes/_authenticated/family.$familyId'
 import { Route as AuthenticatedRoomRoomIdRouteImport } from './routes/_authenticated/room.$roomId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -82,6 +83,12 @@ const ProfileUserIdRoute = ProfileUserIdRouteImport.update({
   path: '/profile/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedFamilyFamilyIdRoute =
+  AuthenticatedFamilyFamilyIdRouteImport.update({
+    id: '/family/$familyId',
+    path: '/family/$familyId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRoomRoomIdRoute = AuthenticatedRoomRoomIdRouteImport.update({
   id: '/room/$roomId',
   path: '/room/$roomId',
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/messages': typeof AuthenticatedMessagesRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
 }
 export interface FileRoutesByTo {
@@ -114,6 +122,7 @@ export interface FileRoutesByTo {
   '/messages': typeof AuthenticatedMessagesRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
 }
 export interface FileRoutesById {
@@ -130,6 +139,7 @@ export interface FileRoutesById {
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/_authenticated/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
   '/_authenticated/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
 }
 export interface FileRouteTypes {
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/wallet'
     | '/profile/$userId'
+    | '/family/$familyId'
     | '/room/$roomId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/wallet'
     | '/profile/$userId'
+    | '/family/$familyId'
     | '/room/$roomId'
   id:
     | '__root__'
@@ -175,6 +187,7 @@ export interface FileRouteTypes {
     | '/_authenticated/messages'
     | '/_authenticated/wallet'
     | '/profile/$userId'
+    | '/_authenticated/family/$familyId'
     | '/_authenticated/room/$roomId'
   fileRoutesById: FileRoutesById
 }
@@ -275,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/family/$familyId': {
+      id: '/_authenticated/family/$familyId'
+      path: '/family/$familyId'
+      fullPath: '/family/$familyId'
+      preLoaderRoute: typeof AuthenticatedFamilyFamilyIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/room/$roomId': {
       id: '/_authenticated/room/$roomId'
       path: '/room/$roomId'
@@ -290,6 +310,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMeRoute: typeof AuthenticatedMeRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
+  AuthenticatedFamilyFamilyIdRoute: typeof AuthenticatedFamilyFamilyIdRoute
   AuthenticatedRoomRoomIdRoute: typeof AuthenticatedRoomRoomIdRoute
 }
 
@@ -298,6 +319,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMeRoute: AuthenticatedMeRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
+  AuthenticatedFamilyFamilyIdRoute: AuthenticatedFamilyFamilyIdRoute,
   AuthenticatedRoomRoomIdRoute: AuthenticatedRoomRoomIdRoute,
 }
 
