@@ -5,40 +5,48 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/BottomNav";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Send } from "lucide-react";
+import { ChatComposer, MessageBody, type OutgoingMessage } from "@/components/ChatComposer";
 
 export const Route = createFileRoute("/_authenticated/messages")({
+  validateSearch: (s: Record<string, unknown>) => ({ to: typeof s['to'] === "string" ? (s['to'] as string) : undefined }),
   component: MessagesPage,
 });
 
 function MessagesPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [active, setActive] = useState<string | null>(null);
-  const [text, setText] = useState("");
+  const search = Route.useSearch();
+  const [active, setActive] = useState<string | null>(search.to ?? null);
+
+  useEffect(() => {
+    if (search.to) setActive(search.to);
+  }, [search.to]);
 
   const dms = useQuery({
     queryKey: ["dms"],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("direct_messages")
-        .select("*")
-        .order("created_at");
+      const { data, error } = await supabase.from("direct_messages").select("*").order("created_at");
       if (error) throw error;
       return data ?? [];
     },
   });
 
   const partnerIds = Array.from(
-    new Set((dms.data ?? []).map((m) => (m.sender_id === user?.id ? m.receiver_id : m.sender_id))),
+    new Set([
+      ...(dms.data ?? []).map((m) => (m.sender_id === user?.id ? m.receiver_id : m.sender_id)),
+      ...(active ? [active] : []),
+    ]),
   );
 
   const partners = useQuery({
     queryKey: ["dm-partners", partnerIds.join(",")],
     enabled: partnerIds.length > 0,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("id, username, avatar_url").in("id", partnerIds);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, username, avatar_url")
+        .in("id", partnerIds);
       if (error) throw error;
       return data ?? [];
     },
@@ -57,20 +65,21 @@ function MessagesPage() {
     };
   }, [user, qc]);
 
-  async function send() {
-    if (!user || !active || !text.trim()) return;
-    const content = text.trim();
-    setText("");
-    const { error } = await supabase
-      .from("direct_messages")
-      .insert({ sender_id: user.id, receiver_id: active, content });
+  async function send(m: OutgoingMessage) {
+    if (!user || !active) return;
+    const { error } = await supabase.from("direct_messages").insert({
+      sender_id: user.id,
+      receiver_id: active,
+      content: m.content,
+      kind: m.kind,
+      media_url: m.media_url,
+    });
     if (error) toast.error(error.message);
     else qc.invalidateQueries({ queryKey: ["dms"] });
   }
 
-  const thread = (dms.data ?? []).filter(
-    (m) => m.sender_id === active || m.receiver_id === active,
-  );
+  const thread = (dms.data ?? []).filter((m) => m.sender_id === active || m.receiver_id === active);
+  const activeName = (partners.data ?? []).find((p) => p.id === active)?.username;
 
   return (
     <AppShell title="الرسائل">
@@ -97,31 +106,22 @@ function MessagesPage() {
       ) : (
         <div className="flex min-h-[70dvh] flex-col px-4 py-3">
           <button onClick={() => setActive(null)} className="mb-2 text-xs font-bold text-primary">
-            ← كل المحادثات
+            ← كل المحادثات {activeName ? `• ${activeName}` : ""}
           </button>
           <div className="flex-1 space-y-2 overflow-y-auto">
-            {thread.map((m) => (
+            {thread.map((m: any) => (
               <div
                 key={m.id}
                 className={`max-w-[75%] rounded-2xl px-3 py-2 text-xs ${
                   m.sender_id === user?.id ? "ms-auto bg-primary text-primary-foreground" : "bg-card"
                 }`}
               >
-                {m.content}
+                <MessageBody kind={m.kind} content={m.content} mediaUrl={m.media_url} />
               </div>
             ))}
           </div>
-          <div className="sticky bottom-20 mt-2 flex items-center gap-2">
-            <input
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && send()}
-              placeholder="اكتب رسالتك…"
-              className="flex-1 rounded-full border border-border bg-input px-4 py-2 text-xs outline-none focus:border-primary"
-            />
-            <button onClick={send} className="rounded-full bg-primary p-2.5 text-primary-foreground">
-              <Send className="h-4 w-4" />
-            </button>
+          <div className="sticky bottom-20 mt-2">
+            <ChatComposer userId={user?.id} onSend={send} />
           </div>
         </div>
       )}

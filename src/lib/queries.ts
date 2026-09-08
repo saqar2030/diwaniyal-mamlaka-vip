@@ -12,6 +12,8 @@ export type Profile = {
   gifts_sent: number;
   level: number;
   name_color: string | null;
+  last_seen_at?: string | null;
+  is_banned?: boolean;
 };
 
 export async function fetchProfile(id: string) {
@@ -39,10 +41,37 @@ export async function fetchTopSupporters() {
   return data ?? [];
 }
 
+/** أفضل 3 داعمين لعضو معيّن */
+export async function fetchTopSupportersOf(userId: string) {
+  const { data, error } = await supabase
+    .from("gift_events")
+    .select("sender_id, amount")
+    .eq("receiver_id", userId)
+    .limit(2000);
+  if (error) throw error;
+  const totals = new Map<string, number>();
+  (data ?? []).forEach((g) => totals.set(g.sender_id, (totals.get(g.sender_id) ?? 0) + Number(g.amount)));
+  const top = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
+  if (top.length === 0) return [] as { id: string; username: string; avatar_url: string | null; amount: number }[];
+  const { data: ps } = await supabase
+    .from("profiles")
+    .select("id, username, avatar_url")
+    .in("id", top.map((t) => t[0]));
+  return top.map(([id, amount]) => {
+    const p = (ps ?? []).find((x) => x.id === id);
+    return { id, amount, username: p?.username ?? "عضو", avatar_url: p?.avatar_url ?? null };
+  });
+}
+
+export function isOnline(lastSeen?: string | null) {
+  if (!lastSeen) return false;
+  return Date.now() - new Date(lastSeen).getTime() < 2 * 60 * 1000;
+}
+
 export function initials(name?: string | null) {
   return (name ?? "؟").trim().slice(0, 2);
 }
 
 export function formatCoins(n: number) {
-  return new Intl.NumberFormat("ar-SA").format(n ?? 0);
+  return new Intl.NumberFormat("ar-SA").format(Number(n ?? 0));
 }
