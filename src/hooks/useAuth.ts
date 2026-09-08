@@ -18,5 +18,14 @@ export function useAuth() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // نبضة الحضور: تحديث "متصل الآن"
+  useEffect(() => {
+    if (!session?.user) return;
+    const ping = () => { void supabase.rpc("touch_presence"); };
+    ping();
+    const t = setInterval(ping, 60_000);
+    return () => clearInterval(t);
+  }, [session?.user?.id]);
+
   return { session, user: (session?.user ?? null) as User | null, loading };
 }
