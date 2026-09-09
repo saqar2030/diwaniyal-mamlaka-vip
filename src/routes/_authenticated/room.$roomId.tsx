@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useVoiceRoom } from "@/lib/useVoiceRoom";
 import { formatCoins } from "@/lib/queries";
-import { ArrowRight, Gift, Mic, MicOff, Send, LogOut } from "lucide-react";
+import { RoomSettings, type RoomRow } from "@/components/RoomSettings";
+import { ArrowRight, Gift, Mic, MicOff, Send, LogOut, Settings, Lock, Ban, VolumeX, Volume2, User } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/room/$roomId")({
   component: RoomPage,
@@ -27,7 +28,11 @@ function RoomPage() {
   const qc = useQueryClient();
   const [text, setText] = useState("");
   const [giftFor, setGiftFor] = useState<string | null>(null);
+  const [menuFor, setMenuFor] = useState<Seat | null>(null);
   const [flying, setFlying] = useState<{ id: string; emoji: string } | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [unlocked, setUnlocked] = useState(false);
   const chatEnd = useRef<HTMLDivElement>(null);
 
   const room = useQuery({
@@ -35,7 +40,35 @@ function RoomPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from("rooms").select("*").eq("id", roomId).maybeSingle();
       if (error) throw error;
-      return data;
+      return data as RoomRow | null;
+    },
+  });
+
+  const staff = useQuery({
+    queryKey: ["room-staff", roomId, user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("room_roles")
+        .select("role")
+        .eq("room_id", roomId)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data?.role ?? null;
+    },
+  });
+
+  const banned = useQuery({
+    queryKey: ["room-banned", roomId, user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("room_bans")
+        .select("id")
+        .eq("room_id", roomId)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return Boolean(data);
     },
   });
 
@@ -90,6 +123,8 @@ function RoomPage() {
     },
   });
 
+  const isOwner = room.data?.owner_id === user?.id;
+  const isStaff = isOwner || Boolean(staff.data);
   const mySeat = (seats.data ?? []).find((s) => s.user_id === user?.id);
   const voice = useVoiceRoom(roomId, user?.id, Boolean(mySeat) && !mySeat?.is_muted);
 
@@ -121,9 +156,16 @@ function RoomPage() {
     chatEnd.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.data]);
 
+  // رسالة الترحيب
+  const welcomed = useRef(false);
+  useEffect(() => {
+    if (welcomed.current || !room.data?.welcome_message) return;
+    welcomed.current = true;
+    toast(room.data.welcome_message);
+  }, [room.data?.welcome_message]);
+
   async function takeSeat(seat: Seat) {
     if (!user) return;
-    if (seat.user_id && seat.user_id !== user.id) { toast.error("المقعد مشغول"); return; }
     if (seat.is_locked) { toast.error("المقعد مقفل"); return; }
     if (seat.user_id === user.id) {
       await supabase.from("room_seats").update({ user_id: null }).eq("id", seat.id);
@@ -138,6 +180,27 @@ function RoomPage() {
   async function toggleMute() {
     if (!mySeat) return;
     await supabase.from("room_seats").update({ is_muted: !mySeat.is_muted }).eq("id", mySeat.id);
+    qc.invalidateQueries({ queryKey: ["seats", roomId] });
+  }
+
+  async function staffMute(seat: Seat) {
+    await supabase.from("room_seats").update({ is_muted: !seat.is_muted }).eq("id", seat.id);
+    setMenuFor(null);
+    qc.invalidateQueries({ queryKey: ["seats", roomId] });
+  }
+
+  async function staffLock(seat: Seat) {
+    await supabase.from("room_seats").update({ is_locked: !seat.is_locked }).eq("id", seat.id);
+    setMenuFor(null);
+    qc.invalidateQueries({ queryKey: ["seats", roomId] });
+  }
+
+  async function staffKick(seat: Seat, ban: boolean) {
+    if (!seat.user_id) return;
+    await supabase.from("room_seats").update({ user_id: null }).eq("id", seat.id);
+    if (ban) await supabase.from("room_bans").insert({ room_id: roomId, user_id: seat.user_id, banned_by: user?.id ?? null });
+    setMenuFor(null);
+    toast.success(ban ? "تم الطرد والحظر" : "تم إنزاله من المايك");
     qc.invalidateQueries({ queryKey: ["seats", roomId] });
   }
 
@@ -170,8 +233,46 @@ function RoomPage() {
 
   const profileOf = (id: string | null) => (people.data ?? []).find((p) => p.id === id);
 
+  if (banned.data) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-3 px-6 text-center">
+        <Ban className="h-10 w-10 text-destructive" />
+        <p className="text-sm font-black">أنت محظور من هذه الغرفة.</p>
+        <button onClick={() => navigate({ to: "/" })} className="rounded-xl bg-primary px-4 py-2 text-xs font-black text-primary-foreground">
+          العودة للرئيسية
+        </button>
+      </div>
+    );
+  }
+
+  const needsPin = room.data?.is_locked && !unlocked && !isStaff;
+  if (needsPin) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-3 px-6 text-center">
+        <Lock className="h-8 w-8 text-primary" />
+        <p className="text-sm font-black">هذه الغرفة مقفلة برقم سري</p>
+        <input
+          type="password"
+          value={pinInput}
+          onChange={(e) => setPinInput(e.target.value)}
+          className="w-full rounded-xl border border-border bg-input px-3 py-2 text-center text-sm outline-none focus:border-primary"
+        />
+        <button
+          onClick={() => (pinInput === room.data?.room_pin ? setUnlocked(true) : toast.error("رقم غير صحيح"))}
+          className="w-full rounded-xl bg-primary py-2 text-xs font-black text-primary-foreground"
+        >
+          دخول
+        </button>
+        <button onClick={() => navigate({ to: "/" })} className="text-[11px] text-muted-foreground">رجوع</button>
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
+    <div
+      className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-cover bg-center"
+      style={room.data?.background_url ? { backgroundImage: `url(${room.data.background_url})` } : undefined}
+    >
       <header className="flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 backdrop-blur">
         <button onClick={leave} className="flex items-center gap-1 text-xs font-bold text-muted-foreground">
           <ArrowRight className="h-4 w-4" /> خروج
@@ -180,23 +281,40 @@ function RoomPage() {
           <h1 className="gold-text text-sm font-black">{room.data?.name ?? "غرفة"}</h1>
           <p className="text-[10px] text-muted-foreground">{room.data?.description}</p>
         </div>
-        <button onClick={leave} className="text-muted-foreground">
-          <LogOut className="h-4 w-4" />
-        </button>
+        {isOwner ? (
+          <button onClick={() => setShowSettings(true)} className="text-primary">
+            <Settings className="h-4 w-4" />
+          </button>
+        ) : (
+          <button onClick={leave} className="text-muted-foreground">
+            <LogOut className="h-4 w-4" />
+          </button>
+        )}
       </header>
 
-      <section className="relative grid grid-cols-4 gap-3 px-4 py-5">
+      {room.data?.banner_url ? (
+        <img
+          src={room.data.banner_url}
+          alt="بنر الغرفة"
+          className={`h-20 w-full object-cover ${room.data.banner_animated ? "banner-animated" : ""}`}
+        />
+      ) : null}
+
+      <section className="relative grid grid-cols-4 gap-3 bg-background/70 px-4 py-5 backdrop-blur-sm">
         {(seats.data ?? []).map((seat) => {
           const p = profileOf(seat.user_id);
           const isSpeaking = seat.user_id ? voice.speaking[seat.user_id] : false;
           return (
             <button
               key={seat.id}
-              onClick={() => (seat.user_id && seat.user_id !== user?.id ? setGiftFor(seat.user_id) : takeSeat(seat))}
+              onClick={() => {
+                if (seat.user_id && seat.user_id !== user?.id) setMenuFor(seat);
+                else takeSeat(seat);
+              }}
               className="flex flex-col items-center gap-1"
             >
               <div
-                className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary text-xl ${
+                className={`relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary text-xl ${
                   seat.user_id ? "gold-ring" : ""
                 } ${isSpeaking ? "speaking-glow" : ""}`}
               >
@@ -204,9 +322,14 @@ function RoomPage() {
                   <img src={p.avatar_url} alt={p.username} className="h-full w-full object-cover" />
                 ) : seat.user_id ? (
                   "👤"
+                ) : seat.is_locked ? (
+                  <Lock className="h-5 w-5 text-muted-foreground" />
                 ) : (
                   <Mic className="h-5 w-5 text-muted-foreground" />
                 )}
+                {seat.user_id && seat.is_muted ? (
+                  <span className="absolute bottom-0 w-full bg-black/60 py-0.5"><MicOff className="mx-auto h-3 w-3 text-destructive" /></span>
+                ) : null}
               </div>
               <span className="w-full truncate text-center text-[10px] font-bold">
                 {p?.username ?? `مقعد ${seat.seat_index}`}
@@ -221,7 +344,7 @@ function RoomPage() {
         )}
       </section>
 
-      <section className="flex-1 space-y-2 overflow-y-auto border-t border-border px-4 py-3">
+      <section className="flex-1 space-y-2 overflow-y-auto border-t border-border bg-background/70 px-4 py-3 backdrop-blur-sm">
         {(messages.data ?? []).map((m: any) => (
           <div key={m.id} className="flex items-start gap-2">
             <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary text-xs">
@@ -258,6 +381,43 @@ function RoomPage() {
         </button>
       </div>
 
+      {menuFor && (
+        <div className="fixed inset-0 z-50 flex items-end bg-black/70" onClick={() => setMenuFor(null)}>
+          <div className="mx-auto w-full max-w-lg space-y-2 rounded-t-3xl border border-border bg-card p-4" onClick={(e) => e.stopPropagation()}>
+            <p className="mb-1 text-center text-sm font-black">{profileOf(menuFor.user_id)?.username ?? "عضو"}</p>
+            <button
+              onClick={() => { setGiftFor(menuFor.user_id); setMenuFor(null); }}
+              className="flex w-full items-center gap-2 rounded-xl bg-primary px-3 py-2 text-xs font-black text-primary-foreground"
+            >
+              <Gift className="h-4 w-4" /> إهداء
+            </button>
+            <button
+              onClick={() => { const id = menuFor.user_id!; setMenuFor(null); navigate({ to: "/profile/$userId", params: { userId: id } }); }}
+              className="flex w-full items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-xs font-black"
+            >
+              <User className="h-4 w-4 text-primary" /> عرض الملف
+            </button>
+            {isStaff && (
+              <>
+                <button onClick={() => staffMute(menuFor)} className="flex w-full items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-xs font-black">
+                  {menuFor.is_muted ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                  {menuFor.is_muted ? "فك الكتم" : "كتم"}
+                </button>
+                <button onClick={() => staffLock(menuFor)} className="flex w-full items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-xs font-black">
+                  <Lock className="h-4 w-4" /> {menuFor.is_locked ? "فتح المقعد" : "قفل المقعد"}
+                </button>
+                <button onClick={() => staffKick(menuFor, false)} className="flex w-full items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-xs font-black">
+                  <MicOff className="h-4 w-4" /> إنزال من المايك
+                </button>
+                <button onClick={() => staffKick(menuFor, true)} className="flex w-full items-center gap-2 rounded-xl bg-destructive px-3 py-2 text-xs font-black text-destructive-foreground">
+                  <Ban className="h-4 w-4" /> طرد وحظر
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {giftFor && (
         <div className="fixed inset-0 z-50 flex items-end bg-black/70" onClick={() => setGiftFor(null)}>
           <div
@@ -282,6 +442,10 @@ function RoomPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {showSettings && room.data && user && (
+        <RoomSettings room={room.data} userId={user.id} onClose={() => setShowSettings(false)} />
       )}
     </div>
   );
