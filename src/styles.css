@@ -200,3 +200,13 @@ body {
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-thumb { background: oklch(0.35 0.04 265); border-radius: 999px; }
+
+/* بنر متحرك */
+.banner-animated {
+  animation: banner-pan 8s ease-in-out infinite alternate;
+  filter: saturate(1.15);
+}
+@keyframes banner-pan {
+  from { object-position: 0% 50%; transform: scale(1.02); }
+  to { object-position: 100% 50%; transform: scale(1.08); }
+}
