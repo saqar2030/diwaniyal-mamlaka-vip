@@ -6,7 +6,7 @@ import { AppShell } from "@/components/BottomNav";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchRooms, fetchTopSupporters, formatCoins } from "@/lib/queries";
-import { Plus, Mic, Crown } from "lucide-react";
+import { Plus, Mic, Crown, Trophy, Search } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -57,18 +57,26 @@ function HomePage() {
           <h1 className="gold-text text-lg font-black">ديوانية المملكة</h1>
           <p className="text-[10px] text-muted-foreground">غرف صوتية مباشرة</p>
         </div>
-        {user ? (
-          <button
-            onClick={() => setCreating((v) => !v)}
-            className="flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-black text-primary-foreground"
-          >
-            <Plus className="h-4 w-4" /> غرفة جديدة
-          </button>
-        ) : (
-          <Link to="/auth" className="rounded-full bg-primary px-3 py-1.5 text-xs font-black text-primary-foreground">
-            دخول
+        <div className="flex items-center gap-2">
+          <Link to="/search" aria-label="بحث" className="rounded-full bg-secondary p-2">
+            <Search className="h-4 w-4 text-primary" />
           </Link>
-        )}
+          <Link to="/leaderboard" aria-label="لوحة التكريم" className="rounded-full bg-secondary p-2">
+            <Trophy className="h-4 w-4 text-primary" />
+          </Link>
+          {user ? (
+            <button
+              onClick={() => setCreating((v) => !v)}
+              className="flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-black text-primary-foreground"
+            >
+              <Plus className="h-4 w-4" /> غرفة جديدة
+            </button>
+          ) : (
+            <Link to="/auth" className="rounded-full bg-primary px-3 py-1.5 text-xs font-black text-primary-foreground">
+              دخول
+            </Link>
+          )}
+        </div>
       </header>
 
       {creating && (
