@@ -11,10 +11,10 @@ export function ChatComposer({
   placeholder = "اكتب رسالتك…",
   extra,
 }: {
-  userId?: string;
+  userId?: string | undefined;
   onSend: (m: OutgoingMessage) => void | Promise<void>;
-  placeholder?: string;
-  extra?: React.ReactNode;
+  placeholder?: string | undefined;
+  extra?: React.ReactNode | undefined;
 }) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);

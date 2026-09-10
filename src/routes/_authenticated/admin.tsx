@@ -86,8 +86,11 @@ function AdminPage() {
     gifts.refetch();
   }
 
-  async function setPackage(id: string, field: "coins" | "price_sar" | "is_active", value: any) {
-    await supabase.from("coin_packages").update({ [field]: value }).eq("id", id);
+  async function setPackage(
+    id: string,
+    patch: { coins?: number; price_sar?: number; is_active?: boolean },
+  ) {
+    await supabase.from("coin_packages").update(patch).eq("id", id);
     packages.refetch();
   }
 
@@ -199,11 +202,11 @@ function AdminPage() {
               {(packages.data ?? []).map((p: any) => (
                 <div key={p.id} className="flex items-center gap-2 py-1 text-[11px]">
                   <span className="flex-1 truncate">{p.name}</span>
-                  <input defaultValue={p.coins} onBlur={(e) => setPackage(p.id, "coins", Number(e.target.value))}
+                  <input defaultValue={p.coins} onBlur={(e) => setPackage(p.id, { coins: Number(e.target.value) })}
                     className="w-20 rounded-lg border border-border bg-input px-2 py-1 outline-none focus:border-primary" />
-                  <input defaultValue={p.price_sar} onBlur={(e) => setPackage(p.id, "price_sar", Number(e.target.value))}
+                  <input defaultValue={p.price_sar} onBlur={(e) => setPackage(p.id, { price_sar: Number(e.target.value) })}
                     className="w-16 rounded-lg border border-border bg-input px-2 py-1 outline-none focus:border-primary" />
-                  <input type="checkbox" checked={p.is_active} onChange={(e) => setPackage(p.id, "is_active", e.target.checked)} />
+                  <input type="checkbox" checked={p.is_active} onChange={(e) => setPackage(p.id, { is_active: e.target.checked })} />
                 </div>
               ))}
             </div>
