@@ -86,8 +86,11 @@ function AdminPage() {
     gifts.refetch();
   }
 
-  async function setPackage(id: string, field: "coins" | "price_sar" | "is_active", value: any) {
-    await supabase.from("coin_packages").update({ [field]: value }).eq("id", id);
+  async function setPackage(
+    id: string,
+    patch: { coins?: number; price_sar?: number; is_active?: boolean },
+  ) {
+    await supabase.from("coin_packages").update(patch).eq("id", id);
     packages.refetch();
   }
 

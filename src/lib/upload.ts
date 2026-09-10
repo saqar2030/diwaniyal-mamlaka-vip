@@ -6,7 +6,7 @@ export async function uploadMedia(userId: string, file: Blob, ext: string) {
   const path = `${userId}/${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage
     .from("media")
-    .upload(path, file, { contentType: file.type || undefined, upsert: false });
+    .upload(path, file, file.type ? { contentType: file.type, upsert: false } : { upsert: false });
   if (error) throw error;
   const { data, error: signErr } = await supabase.storage.from("media").createSignedUrl(path, YEAR);
   if (signErr) throw signErr;
