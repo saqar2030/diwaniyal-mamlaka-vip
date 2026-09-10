@@ -1,0 +1,9 @@
+revoke execute on function public.has_role(uuid, app_role) from anon;
+revoke execute on function public.is_family_member(uuid, uuid) from anon;
+revoke execute on function public.is_family_owner(uuid, uuid) from anon;
+revoke execute on function public.is_room_owner(uuid, uuid) from anon;
+revoke execute on function public.is_room_staff(uuid, uuid) from anon;
+revoke execute on function public.verify_super_pin(text) from anon, authenticated;
+revoke execute on function public.bump_couple() from anon, authenticated;
+revoke execute on function public.create_room_seats() from anon, authenticated;
+revoke execute on function public.handle_new_user() from anon, authenticated;
