@@ -3,11 +3,13 @@ import { Home, Users, MessageCircle, Newspaper, User } from "lucide-react";
 
 const items = [
   { to: "/", label: "الرئيسية", icon: Home },
-  { to: "/feed", label: "المجتمع", icon: Newspaper },
+  { to: "/feed", label: "المجتمع", icon: Users },
   { to: "/families", label: "القروبات", icon: Users },
   { to: "/messages", label: "الرسائل", icon: MessageCircle },
-  { to: "/me", label: "حسابي", icon: User },
+  { to: "/me", label: "حسابي", icon: Users },
+  { to: "/games", label: "الألعاب", icon: MessageCircle }
 ] as const;
+
 
 export function BottomNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
