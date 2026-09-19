@@ -95,6 +95,9 @@ function FeedPage() {
           <p className="py-10 text-center text-xs text-muted-foreground">لا توجد منشورات بعد.</p>
         )}
       </div>
-    </AppShell>
+   <ChatGames />
+</AppShell>
+
+
   );
 }
