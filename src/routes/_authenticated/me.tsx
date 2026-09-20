@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { fetchProfile, fetchTopSupportersOf, formatCoins } from "@/lib/queries";
 import { uploadMedia, extOf } from "@/lib/upload";
 import { Coins, LogOut, Camera, Trophy, Search, Shield } from "lucide-react";
-import UserLevels from "../../components/UserLevels";
+
 
 
 export const Route = createFileRoute("/_authenticated/me")({
@@ -175,7 +175,7 @@ function MePage() {
           <LogOut className="h-4 w-4" /> تسجيل الخروج
        </button>
 </div>
-<UserLevels />
+
 </AppShell>
 );
 }  
