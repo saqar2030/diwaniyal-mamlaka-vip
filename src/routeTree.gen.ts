@@ -244,7 +244,8 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
-      parentRoute: typeof rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+
     }
     '/leaderboard': {
       id: '/leaderboard'
@@ -342,17 +343,22 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   SearchRoute: SearchRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
-}
-export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRoute._addChildren([
+  IndexRoute,
+  AuthenticatedRouteRoute._addFileChildren([
+    AuthenticatedGamesRoute,
+    FamiliesRoute,
+    FeedRoute,
+    LeaderboardRoute,
+    SearchRoute,
+    ProfileUserIdRoute,
+    AuthenticatedAdminRoute,
+    AuthenticatedMeRoute,
+    AuthenticatedMessagesRoute,
+    AuthenticatedWalletRoute,
+    AuthenticatedFamilyForumRoute,
+    AuthenticatedRoomRoute,
+  ]),
+  AuthRoute,
+])
 
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
