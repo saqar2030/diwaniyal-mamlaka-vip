@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchRooms, fetchTopSupporters, formatCoins } from "@/lib/queries";
 import { Plus, Mic, Crown, Trophy, Search } from "lucide-react";
+import UserLevels from "@/components/UserLevels";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -145,7 +146,9 @@ function HomePage() {
         {!rooms.isLoading && (rooms.data ?? []).length === 0 && (
           <p className="py-10 text-center text-xs text-muted-foreground">لا توجد غرف بعد — أنشئ أول غرفة!</p>
         )}
-      </section>
-    </AppShell>
-  );
-}
+  </section>    
+     <UserLevels />
+</AppShell>
+  );  
+ } 
+
