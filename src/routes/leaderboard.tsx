@@ -56,9 +56,14 @@ function LeaderboardPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, username, gifts_received")
-        .order("gifts_received", { ascending: false })
-        .limit(3);
+.select("id, username, level, xp")
+.order("level", { ascending: false }).order("xp", { ascending: false })
+
+
+.limit(10)
+
+
+        
       return data ?? [];
     },
   });
