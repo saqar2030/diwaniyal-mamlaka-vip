@@ -23,6 +23,7 @@ import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as AuthenticatedFamilyFamilyIdRouteImport } from './routes/_authenticated/family.$familyId'
 import { Route as AuthenticatedRoomRoomIdRouteImport } from './routes/_authenticated/room.$roomId'
+import { Route as AuthenticatedGamesRoute } from './routes/_authenticated/games'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,6 +43,12 @@ const FamiliesRoute = FamiliesRouteImport.update({
   id: '/families',
   path: '/families',
   getParentRoute: () => rootRouteImport,
+const AuthenticatedGamesRoute = AuthenticatedGamesRouteImport.update({
+  id: '/_authenticated/games',
+  path: '/games',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+
 } as any)
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
