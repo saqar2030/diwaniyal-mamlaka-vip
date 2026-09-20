@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchRooms, fetchTopSupporters, formatCoins } from "@/lib/queries";
 import { Plus, Mic, Crown, Trophy, Search } from "lucide-react";
-import UserLevels from "../../components/UserLevels";
+
 
 
 
@@ -149,7 +149,7 @@ function HomePage() {
           <p className="py-10 text-center text-xs text-muted-foreground">لا توجد غرف بعد — أنشئ أول غرفة!</p>
         )}
   </section>    
-     <UserLevels />
+
 </AppShell>
   );  
  } 
