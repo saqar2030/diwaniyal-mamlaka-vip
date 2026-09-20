@@ -10,6 +10,7 @@ import { Plus, Mic, Crown, Trophy, Search } from "lucide-react";
 import UserLevels from "../../components/UserLevels";
 
 
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
