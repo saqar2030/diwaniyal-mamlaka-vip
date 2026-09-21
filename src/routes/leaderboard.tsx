@@ -54,20 +54,21 @@ function LeaderboardPage() {
   const supporters = useQuery({
     queryKey: ["lb-supporters"],
     queryFn: async () => {
-                const { data } = await supabase
-            .from("profiles")
-            .select("id, username")
-            .limit(10);
-          
-          const safeData = (data ?? []).map(user => ({
-            ...user,
-            level: (user as any).level ?? 1,
-            xp: (user as any).xp ?? 0
-          }));
-          
-          return safeData;
+                        const { data } = await supabase
+          .from("profiles")
+          .select("id, username, gifts_received")
+          .order("gifts_received", { ascending: false })
+          .limit(10);
+        
+        const safeData = (data ?? []).map(user => ({
+          ...user,
+          gifts_received: user.gifts_received ?? 0,
+          level: (user as any).level ?? 1,
+          xp: (user as any).xp ?? 0
+        }));
+        
+        return safeData;
 
-    },
   });
 
   const rooms = useQuery({
