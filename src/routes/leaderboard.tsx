@@ -68,7 +68,7 @@ function LeaderboardPage() {
         }));
         
         return safeData;
-
+},
   });
 
   const rooms = useQuery({
