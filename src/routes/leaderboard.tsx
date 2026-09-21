@@ -54,17 +54,19 @@ function LeaderboardPage() {
   const supporters = useQuery({
     queryKey: ["lb-supporters"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-.select("id, username, level, xp")
-.order("level", { ascending: false }).order("xp", { ascending: false })
+                const { data } = await supabase
+            .from("profiles")
+            .select("id, username")
+            .limit(10);
+          
+          const safeData = (data ?? []).map(user => ({
+            ...user,
+            level: (user as any).level ?? 1,
+            xp: (user as any).xp ?? 0
+          }));
+          
+          return safeData;
 
-
-.limit(10)
-
-
-        
-      return data ?? [];
     },
   });
 
