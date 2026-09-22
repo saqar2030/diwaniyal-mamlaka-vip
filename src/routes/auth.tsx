@@ -3,8 +3,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-
-
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
@@ -52,7 +50,7 @@ function AuthPage() {
     }
   }
 
-    async function google() {
+  async function google() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -67,7 +65,6 @@ function AuthPage() {
   }
 
   return (
-
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5">
       <div className="mb-6 text-center">
         <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-3xl bg-card text-4xl gold-ring">
