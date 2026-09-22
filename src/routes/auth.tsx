@@ -65,6 +65,7 @@ function AuthPage() {
     }
   }
 
+  return (
 
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5">
       <div className="mb-6 text-center">
