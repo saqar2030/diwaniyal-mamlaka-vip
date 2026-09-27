@@ -6,8 +6,8 @@ const items = [
   { to: "/feed", label: "المجتمع", icon: Users },
   { to: "/families", label: "القروبات", icon: Users },
   { to: "/messages", label: "الرسائل", icon: MessageCircle },
-  { to: "/me", label: "حسابي", icon: Users },
-  { to: "/", label: "الألعاب", icon: MessageCircle } // تم إرجاع الرابط الأصلي المستقر وتوجيهه للرئيسية لمنع خطأ 404
+  { to: "/me", label: "حسابي", icon: User },
+  { to: "/", label: "الألعاب", icon: MessageCircle } // أعدنا الأيقونة الأصلية والمسار الآمن لمنع أي تعليق في النظام
 ] as const;
 
 
