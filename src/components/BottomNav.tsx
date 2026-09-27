@@ -1,13 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Users, MessageCircle, Newspaper, User, Gamepad2 } from "lucide-react";
+import { Home, Users, MessageCircle, Newspaper, User } from "lucide-react";
 
 const items = [
   { to: "/", label: "الرئيسية", icon: Home },
   { to: "/feed", label: "المجتمع", icon: Users },
   { to: "/families", label: "القروبات", icon: Users },
   { to: "/messages", label: "الرسائل", icon: MessageCircle },
-  { to: "/me", label: "حسابي", icon: User },
-  { to: "/", label: "الألعاب", icon: Gamepad2 } // تم توجيه الرابط للرئيسية/الشات حيث يوجد بوت الألعاب، واستبدال الأيقونة بأيقونة ألعاب (Gamepad) احترافية
+  { to: "/me", label: "حسابي", icon: Users },
+  { to: "/", label: "الألعاب", icon: MessageCircle } // تم إرجاع الرابط الأصلي المستقر وتوجيهه للرئيسية لمنع خطأ 404
 ] as const;
 
 
@@ -20,7 +20,7 @@ export function BottomNav() {
           const active = to === "/" ? path === "/" : path.startsWith(to);
           return (
             <Link
-              key={label} // تم تغيير المفتاح إلى label لضمان عمل التكرار بشكل صحيح ومستقر
+              key={to}
               to={to}
               className={`flex flex-1 flex-col items-center gap-1 rounded-xl py-1.5 text-[10px] font-bold transition-colors ${
                 active ? "text-primary" : "text-muted-foreground"
