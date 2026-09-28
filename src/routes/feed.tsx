@@ -6,7 +6,8 @@ import { AppShell } from "@/components/BottomNav";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Heart, MessageSquare } from "lucide-react";
-import { SnakeGame } from "../../../SnakeGame";
+import ChatGames from "../../components/ChatGames";
+
 
 
 
