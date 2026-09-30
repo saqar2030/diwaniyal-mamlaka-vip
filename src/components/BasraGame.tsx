@@ -12,7 +12,7 @@ export default function BasraGame() {
   // دالة لإنشاء كرت عشوائي
   const generateRandomCard = (): Card => {
     const names = ['7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-    const values =; // قيمة الأك 1 والولد 11
+    const values = [7, 8, 9, 10, 11, 12, 13, 1]; // قيمة الأك 1 والولد 11
     const randomIdx = Math.floor(Math.random() * names.length);
     const suit = suits[Math.floor(Math.random() * suits.length)];
     return {
