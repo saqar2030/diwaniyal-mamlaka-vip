@@ -23,7 +23,6 @@ import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as AuthenticatedFamilyFamilyIdRouteImport } from './routes/_authenticated/family.$familyId'
 import { Route as AuthenticatedRoomRoomIdRouteImport } from './routes/_authenticated/room.$roomId'
-import { Route as AuthenticatedGamesRoute } from './routes/_authenticated/games'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -43,12 +42,6 @@ const FamiliesRoute = FamiliesRouteImport.update({
   id: '/families',
   path: '/families',
   getParentRoute: () => rootRouteImport,
-const AuthenticatedGamesRoute = AuthenticatedGamesRouteImport.update({
-  id: '/_authenticated/games',
-  path: '/games',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-
 } as any)
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
@@ -244,8 +237,7 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
-  ._addFileChildren(rootRouteChildren)
-
+      parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
       id: '/leaderboard'
@@ -343,22 +335,17 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   SearchRoute: SearchRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
-export const routeTree = rootRoute._addChildren([
-  IndexRoute,
-  AuthenticatedRouteRoute._addFileChildren([
-    AuthenticatedGamesRoute,
-    FamiliesRoute,
-    FeedRoute,
-    LeaderboardRoute,
-    SearchRoute,
-    ProfileUserIdRoute,
-    AuthenticatedAdminRoute,
-    AuthenticatedMeRoute,
-    AuthenticatedMessagesRoute,
-    AuthenticatedWalletRoute,
-    AuthenticatedFamilyForumRoute,
-    AuthenticatedRoomRoute,
-  ]),
-  AuthRoute,
-])
+}
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
