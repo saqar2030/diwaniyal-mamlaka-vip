@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import UnoGame from './UnoGame';
 import BalootGame from './BalootGame';

@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Image as ImageIcon, Mic, Send, Square } from "lucide-react";
 import { uploadMedia, extOf } from "@/lib/upload";
-import { supabase } from "@/lib/supabase"; // استدعاء السيرفر للاتصال بالجدول الجديد
+import { supabase } from "@/integrations/supabase/client"; // استدعاء السيرفر للاتصال بالجدول الجديد
 
 export type OutgoingMessage = { kind: "text" | "image" | "audio"; content: string; media_url: string | null };
 

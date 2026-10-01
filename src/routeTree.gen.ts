@@ -17,13 +17,13 @@ import { Route as FeedRouteImport } from './routes/feed'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedGamesRouteImport } from './routes/_authenticated/games'
 import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as AuthenticatedFamilyFamilyIdRouteImport } from './routes/_authenticated/family.$familyId'
 import { Route as AuthenticatedRoomRoomIdRouteImport } from './routes/_authenticated/room.$roomId'
-import { Route as AuthenticatedGamesRoute } from './routes/_authenticated/games'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -43,12 +43,6 @@ const FamiliesRoute = FamiliesRouteImport.update({
   id: '/families',
   path: '/families',
   getParentRoute: () => rootRouteImport,
-const AuthenticatedGamesRoute = AuthenticatedGamesRouteImport.update({
-  id: '/_authenticated/games',
-  path: '/games',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-
 } as any)
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
@@ -68,6 +62,11 @@ const SearchRoute = SearchRouteImport.update({
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGamesRoute = AuthenticatedGamesRouteImport.update({
+  id: '/games',
+  path: '/games',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
@@ -110,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/search': typeof SearchRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/games': typeof AuthenticatedGamesRoute
   '/me': typeof AuthenticatedMeRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/wallet': typeof AuthenticatedWalletRoute
@@ -125,6 +125,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/search': typeof SearchRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/games': typeof AuthenticatedGamesRoute
   '/me': typeof AuthenticatedMeRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/wallet': typeof AuthenticatedWalletRoute
@@ -142,6 +143,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/search': typeof SearchRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/games': typeof AuthenticatedGamesRoute
   '/_authenticated/me': typeof AuthenticatedMeRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
@@ -159,6 +161,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/search'
     | '/admin'
+    | '/games'
     | '/me'
     | '/messages'
     | '/wallet'
@@ -174,6 +177,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/search'
     | '/admin'
+    | '/games'
     | '/me'
     | '/messages'
     | '/wallet'
@@ -190,6 +194,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/search'
     | '/_authenticated/admin'
+    | '/_authenticated/games'
     | '/_authenticated/me'
     | '/_authenticated/messages'
     | '/_authenticated/wallet'
@@ -244,8 +249,7 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
-  ._addFileChildren(rootRouteChildren)
-
+      parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
       id: '/leaderboard'
@@ -266,6 +270,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/games': {
+      id: '/_authenticated/games'
+      path: '/games'
+      fullPath: '/games'
+      preLoaderRoute: typeof AuthenticatedGamesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/me': {
@@ -315,6 +326,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedGamesRoute: typeof AuthenticatedGamesRoute
   AuthenticatedMeRoute: typeof AuthenticatedMeRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
@@ -324,6 +336,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedGamesRoute: AuthenticatedGamesRoute,
   AuthenticatedMeRoute: AuthenticatedMeRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
@@ -343,22 +356,17 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   SearchRoute: SearchRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
-export const routeTree = rootRoute._addChildren([
-  IndexRoute,
-  AuthenticatedRouteRoute._addFileChildren([
-    AuthenticatedGamesRoute,
-    FamiliesRoute,
-    FeedRoute,
-    LeaderboardRoute,
-    SearchRoute,
-    ProfileUserIdRoute,
-    AuthenticatedAdminRoute,
-    AuthenticatedMeRoute,
-    AuthenticatedMessagesRoute,
-    AuthenticatedWalletRoute,
-    AuthenticatedFamilyForumRoute,
-    AuthenticatedRoomRoute,
-  ]),
-  AuthRoute,
-])
+}
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
