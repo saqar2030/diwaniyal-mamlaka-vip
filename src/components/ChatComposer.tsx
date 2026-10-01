@@ -2,9 +2,8 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Image as ImageIcon, Mic, Send, Square } from "lucide-react";
 import { uploadMedia, extOf } from "@/lib/upload";
-import { supabase } from "@/integrations/supabase/client"; // استدعاء السيرفر للاتصال بالجدول الجديد
 
-export type OutgoingMessage = { kind: "text" | "image" | "audio"; content: string; media_url: string | null };
+export type OutgoingMessage = { kind: "text" | "image" | "audio" | "video"; content: string; media_url: string | null };
 
 export function ChatComposer({
   userId,
@@ -24,41 +23,8 @@ export function ChatComposer({
   const chunksRef = useRef<BlobPart[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // دالة برمجية خلفية لزيادة النقاط واللفل في السيرفر مجاناً
-  async function updateUserXP(pointsToAdd: number) {
-    if (!userId) return;
-    try {
-      // 1. جلب بيانات اللفل الحالية للعضو
-      const { data, error } = await supabase
-        .from("user_levels")
-        .select("xp_points, current_level")
-        .eq("user_id", userId)
-        .maybeSingle();
-
-      let currentXP = data?.xp_points ? Number(data.xp_points) : 0;
-      let currentLevel = data?.current_level ? Number(data.current_level) : 1;
-
-      let newXP = currentXP + pointsToAdd;
-      let newLevel = currentLevel;
-
-      // إذا وصلت النقاط لـ 100 يرتفع اللفل
-      if (newXP >= 100) {
-        newLevel += 1;
-        newXP = newXP - 100;
-        toast.success(`🎉 كفو! ارتفع مستواك في الديوانية إلى لفل ${newLevel}!`);
-      }
-
-      // 2. تحديث أو إدخال البيانات الجديدة في الجدول الآمن
-      await supabase.from("user_levels").upsert({
-        user_id: userId,
-        xp_points: newXP,
-        current_level: newLevel,
-      }, { onConflict: "user_id" });
-
-    } catch (err) {
-      console.error("خطأ في تحديث نقاط اللفل", err);
-    }
-  }
+  // النقاط واللفل تُحتسب تلقائياً في السيرفر مع كل رسالة
+  async function updateUserXP(_pointsToAdd: number) {}
 
   // دالة تشغيل بوت ألعاب المسابقات التفاعلي داخل الشات
   function handleQuizBot(messageText: string) {
@@ -112,11 +78,13 @@ export function ChatComposer({
     if (!file || !userId) return;
     setBusy(true);
     try {
+      if (file.size > 50 * 1024 * 1024) { toast.error("الحد الأقصى للملف 50 ميجا"); return; }
+      const isVideo = file.type.startsWith("video/");
       const url = await uploadMedia(userId, file, extOf(file));
-      await onSend({ kind: "image", content: "", media_url: url });
+      await onSend({ kind: isVideo ? "video" : "image", content: "", media_url: url });
       await updateUserXP(10); // زيادة النقاط عند إرسال صورة
     } catch (err) {
-      toast.error("تعذّر رفع الصورة");
+      toast.error("تعذّر رفع الملف");
     } finally {
       setBusy(false);
     }
@@ -161,12 +129,12 @@ export function ChatComposer({
   return (
     <div className="flex items-center gap-2">
       {extra}
-      <input ref={fileRef} type="file" accept="image/*" hidden onChange={pickImage} />
+      <input ref={fileRef} type="file" accept="image/*,video/*" hidden onChange={pickImage} />
       <button
         onClick={() => fileRef.current?.click()}
         disabled={busy}
         className="rounded-full bg-secondary p-2.5 disabled:opacity-50"
-        aria-label="إرسال صورة"
+        aria-label="إرسال صورة أو فيديو"
       >
         <ImageIcon className="h-4 w-4 text-primary" />
       </button>
@@ -195,6 +163,8 @@ export function ChatComposer({
 export function MessageBody({ kind, content, mediaUrl }: { kind?: string | null; content: string; mediaUrl?: string | null }) {
   if (kind === "image" && mediaUrl)
     return <img src={mediaUrl} alt="صورة" className="max-h-56 rounded-xl object-cover" loading="lazy" />;
+  if (kind === "video" && mediaUrl)
+    return <video controls playsInline src={mediaUrl} className="max-h-64 w-56 rounded-xl" preload="metadata" />;
   if (kind === "audio" && mediaUrl) return <audio controls src={mediaUrl} className="h-9 w-52" />;
   return <span>{content}</span>;
 }
