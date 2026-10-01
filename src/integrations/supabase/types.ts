@@ -725,6 +725,35 @@ export type Database = {
           },
         ]
       }
+      user_levels: {
+        Row: {
+          current_level: number
+          updated_at: string
+          user_id: string
+          xp_points: number
+        }
+        Insert: {
+          current_level?: number
+          updated_at?: string
+          user_id: string
+          xp_points?: number
+        }
+        Update: {
+          current_level?: number
+          updated_at?: string
+          user_id?: string
+          xp_points?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_levels_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
