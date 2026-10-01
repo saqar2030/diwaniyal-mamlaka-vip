@@ -24,41 +24,8 @@ export function ChatComposer({
   const chunksRef = useRef<BlobPart[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // دالة برمجية خلفية لزيادة النقاط واللفل في السيرفر مجاناً
-  async function updateUserXP(pointsToAdd: number) {
-    if (!userId) return;
-    try {
-      // 1. جلب بيانات اللفل الحالية للعضو
-      const { data, error } = await supabase
-        .from("user_levels")
-        .select("xp_points, current_level")
-        .eq("user_id", userId)
-        .maybeSingle();
-
-      let currentXP = data?.xp_points ? Number(data.xp_points) : 0;
-      let currentLevel = data?.current_level ? Number(data.current_level) : 1;
-
-      let newXP = currentXP + pointsToAdd;
-      let newLevel = currentLevel;
-
-      // إذا وصلت النقاط لـ 100 يرتفع اللفل
-      if (newXP >= 100) {
-        newLevel += 1;
-        newXP = newXP - 100;
-        toast.success(`🎉 كفو! ارتفع مستواك في الديوانية إلى لفل ${newLevel}!`);
-      }
-
-      // 2. تحديث أو إدخال البيانات الجديدة في الجدول الآمن
-      await supabase.from("user_levels").upsert({
-        user_id: userId,
-        xp_points: newXP,
-        current_level: newLevel,
-      }, { onConflict: "user_id" });
-
-    } catch (err) {
-      console.error("خطأ في تحديث نقاط اللفل", err);
-    }
-  }
+  // النقاط واللفل تُحتسب تلقائياً في السيرفر مع كل رسالة
+  async function updateUserXP(_pointsToAdd: number) {}
 
   // دالة تشغيل بوت ألعاب المسابقات التفاعلي داخل الشات
   function handleQuizBot(messageText: string) {
