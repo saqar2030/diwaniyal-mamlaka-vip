@@ -2,9 +2,8 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Image as ImageIcon, Mic, Send, Square } from "lucide-react";
 import { uploadMedia, extOf } from "@/lib/upload";
-import { supabase } from "@/integrations/supabase/client"; // استدعاء السيرفر للاتصال بالجدول الجديد
 
-export type OutgoingMessage = { kind: "text" | "image" | "audio"; content: string; media_url: string | null };
+export type OutgoingMessage = { kind: "text" | "image" | "audio" | "video"; content: string; media_url: string | null };
 
 export function ChatComposer({
   userId,
@@ -79,11 +78,13 @@ export function ChatComposer({
     if (!file || !userId) return;
     setBusy(true);
     try {
+      if (file.size > 50 * 1024 * 1024) { toast.error("الحد الأقصى للملف 50 ميجا"); return; }
+      const isVideo = file.type.startsWith("video/");
       const url = await uploadMedia(userId, file, extOf(file));
-      await onSend({ kind: "image", content: "", media_url: url });
+      await onSend({ kind: isVideo ? "video" : "image", content: "", media_url: url });
       await updateUserXP(10); // زيادة النقاط عند إرسال صورة
     } catch (err) {
-      toast.error("تعذّر رفع الصورة");
+      toast.error("تعذّر رفع الملف");
     } finally {
       setBusy(false);
     }
@@ -128,12 +129,12 @@ export function ChatComposer({
   return (
     <div className="flex items-center gap-2">
       {extra}
-      <input ref={fileRef} type="file" accept="image/*" hidden onChange={pickImage} />
+      <input ref={fileRef} type="file" accept="image/*,video/*" hidden onChange={pickImage} />
       <button
         onClick={() => fileRef.current?.click()}
         disabled={busy}
         className="rounded-full bg-secondary p-2.5 disabled:opacity-50"
-        aria-label="إرسال صورة"
+        aria-label="إرسال صورة أو فيديو"
       >
         <ImageIcon className="h-4 w-4 text-primary" />
       </button>
@@ -162,6 +163,8 @@ export function ChatComposer({
 export function MessageBody({ kind, content, mediaUrl }: { kind?: string | null; content: string; mediaUrl?: string | null }) {
   if (kind === "image" && mediaUrl)
     return <img src={mediaUrl} alt="صورة" className="max-h-56 rounded-xl object-cover" loading="lazy" />;
+  if (kind === "video" && mediaUrl)
+    return <video controls playsInline src={mediaUrl} className="max-h-64 w-56 rounded-xl" preload="metadata" />;
   if (kind === "audio" && mediaUrl) return <audio controls src={mediaUrl} className="h-9 w-52" />;
   return <span>{content}</span>;
 }
