@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -23,6 +23,13 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // إذا كان العضو مسجّل دخول (مثلاً بعد الرجوع من جوجل) نوديه للرئيسية
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => { if (data.session) navigate({ to: "/" }); });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => { if (s) navigate({ to: "/" }); });
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
