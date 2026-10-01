@@ -419,6 +419,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_hidden: boolean
+          media_kind: string | null
           user_id: string
         }
         Insert: {
@@ -427,6 +428,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_hidden?: boolean
+          media_kind?: string | null
           user_id: string
         }
         Update: {
@@ -435,6 +437,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_hidden?: boolean
+          media_kind?: string | null
           user_id?: string
         }
         Relationships: [
@@ -679,11 +682,13 @@ export type Database = {
           description: string | null
           id: string
           is_locked: boolean
+          level: number
           name: string
           owner_id: string
           room_pin: string | null
           seat_count: number
           welcome_message: string | null
+          xp_points: number
         }
         Insert: {
           background_url?: string | null
@@ -694,11 +699,13 @@ export type Database = {
           description?: string | null
           id?: string
           is_locked?: boolean
+          level?: number
           name: string
           owner_id: string
           room_pin?: string | null
           seat_count?: number
           welcome_message?: string | null
+          xp_points?: number
         }
         Update: {
           background_url?: string | null
@@ -709,11 +716,13 @@ export type Database = {
           description?: string | null
           id?: string
           is_locked?: boolean
+          level?: number
           name?: string
           owner_id?: string
           room_pin?: string | null
           seat_count?: number
           welcome_message?: string | null
+          xp_points?: number
         }
         Relationships: [
           {
@@ -777,6 +786,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_room_xp: { Args: { _pts: number; _room: string }; Returns: undefined }
+      add_user_xp: { Args: { _pts: number; _user: string }; Returns: undefined }
       claim_super_admin: { Args: { _pin: string }; Returns: boolean }
       has_role: {
         Args: {
