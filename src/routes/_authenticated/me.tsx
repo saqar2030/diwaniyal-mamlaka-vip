@@ -191,7 +191,7 @@ function MePage() {
           {(supporters.data ?? []).map((s, i) => (
             <Link
               key={s.id}
-              to="/profile/\$userId"
+              to="/profile/$userId"
               params={{ userId: s.id }}
               className="flex items-center gap-2 border-b border-border/50 py-1.5 text-[11px] last:border-0"
             >

@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Users, MessageCircle, Newspaper, User } from "lucide-react";
+import { Home, Users, MessageCircle, User, Gamepad2 } from "lucide-react";
 
 const items = [
   { to: "/", label: "الرئيسية", icon: Home },
@@ -7,7 +7,7 @@ const items = [
   { to: "/families", label: "القروبات", icon: Users },
   { to: "/messages", label: "الرسائل", icon: MessageCircle },
   { to: "/me", label: "حسابي", icon: User },
-  { to: "/", label: "الألعاب", icon: MessageCircle } // أعدنا الأيقونة الأصلية والمسار الآمن لمنع أي تعليق في النظام
+  { to: "/games", label: "الألعاب", icon: Gamepad2 },
 ] as const;
 
 
