@@ -179,6 +179,45 @@ export type Database = {
         }
         Relationships: []
       }
+      family_bans: {
+        Row: {
+          banned_by: string | null
+          created_at: string
+          family_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          banned_by?: string | null
+          created_at?: string
+          family_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          banned_by?: string | null
+          created_at?: string
+          family_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_bans_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_bans_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_members: {
         Row: {
           family_id: string
@@ -796,11 +835,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_family_manager: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_family_member: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
       is_family_owner: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_family_staff: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
@@ -829,6 +876,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      set_room_seat_count: {
+        Args: { _n: number; _room: string }
+        Returns: undefined
       }
       set_super_pin: { Args: { _new: string; _old: string }; Returns: boolean }
       topup_coins: { Args: { _package_id: string }; Returns: number }
