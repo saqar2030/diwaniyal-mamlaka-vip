@@ -17,6 +17,7 @@ export type RoomRow = {
   welcome_message: string | null;
   is_locked: boolean;
   room_pin: string | null;
+  seat_count?: number;
 };
 
 export function RoomSettings({ room, userId, onClose }: { room: RoomRow; userId: string; onClose: () => void }) {
@@ -30,6 +31,7 @@ export function RoomSettings({ room, userId, onClose }: { room: RoomRow; userId:
   const [banner, setBanner] = useState(room.banner_url ?? "");
   const [background, setBackground] = useState(room.background_url ?? "");
   const [targetId, setTargetId] = useState("");
+  const [seatCount, setSeatCount] = useState(room.seat_count ?? 8);
   const [busy, setBusy] = useState(false);
   const bgRef = useRef<HTMLInputElement>(null);
   const bannerRef = useRef<HTMLInputElement>(null);
@@ -127,7 +129,15 @@ export function RoomSettings({ room, userId, onClose }: { room: RoomRow; userId:
 
   async function unban(id: string) {
     await supabase.from("room_bans").delete().eq("id", id);
+    toast.success("تم إرجاع العضو، يقدر يدخل الروم من جديد");
     bans.refetch();
+  }
+
+  async function changeSeats(n: number) {
+    const { error } = await supabase.rpc("set_room_seat_count", { _room: room.id, _n: n });
+    if (error) { toast.error(error.message); return; }
+    setSeatCount(n);
+    qc.invalidateQueries({ queryKey: ["seats", room.id] });
   }
 
   useEffect(() => {
@@ -188,6 +198,15 @@ export function RoomSettings({ room, userId, onClose }: { room: RoomRow; userId:
         <button onClick={save} className="w-full rounded-xl bg-primary py-2 text-xs font-black text-primary-foreground">
           حفظ الإعدادات
         </button>
+
+        <div className="flex items-center justify-between rounded-xl bg-secondary px-3 py-2 text-[11px] font-bold">
+          عدد الكراسي
+          <div className="flex items-center gap-2">
+            <button onClick={() => changeSeats(seatCount - 1)} className="h-7 w-7 rounded-full bg-card text-sm font-black">−</button>
+            <span className="w-5 text-center text-primary">{seatCount}</span>
+            <button onClick={() => changeSeats(seatCount + 1)} className="h-7 w-7 rounded-full bg-card text-sm font-black">+</button>
+          </div>
+        </div>
 
         <div className="space-y-2 rounded-2xl border border-border p-3">
           <p className="flex items-center gap-1 text-xs font-black"><Shield className="h-4 w-4 text-primary" /> الصلاحيات والحظر</p>

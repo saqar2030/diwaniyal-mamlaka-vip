@@ -308,7 +308,7 @@ function RoomPage() {
             <button
               key={seat.id}
               onClick={() => {
-                if (seat.user_id && seat.user_id !== user?.id) setMenuFor(seat);
+                if ((seat.user_id && seat.user_id !== user?.id) || (isStaff && !seat.user_id)) setMenuFor(seat);
                 else takeSeat(seat);
               }}
               className="flex flex-col items-center gap-1"
@@ -373,7 +373,7 @@ function RoomPage() {
           placeholder="اكتب رسالتك…"
           className="flex-1 rounded-full border border-border bg-input px-4 py-2 text-xs outline-none focus:border-primary"
         />
-        <button onClick={() => setGiftFor(seatUserIds.find((id) => id !== user?.id) ?? null)} className="rounded-full bg-secondary p-2.5">
+        <button onClick={() => setGiftFor(seatUserIds.find((id) => id !== user?.id) ?? "")} className="rounded-full bg-secondary p-2.5">
           <Gift className="h-4 w-4 text-primary" />
         </button>
         <button onClick={send} className="rounded-full bg-primary p-2.5 text-primary-foreground">
@@ -381,7 +381,24 @@ function RoomPage() {
         </button>
       </div>
 
-      {menuFor && (
+      {menuFor && !menuFor.user_id && (
+        <div className="fixed inset-0 z-50 flex items-end bg-black/70" onClick={() => setMenuFor(null)}>
+          <div className="mx-auto w-full max-w-lg space-y-2 rounded-t-3xl border border-border bg-card p-4" onClick={(e) => e.stopPropagation()}>
+            <p className="mb-1 text-center text-sm font-black">مقعد {menuFor.seat_index}</p>
+            {!menuFor.is_locked && (
+              <button onClick={() => { const s = menuFor; setMenuFor(null); takeSeat(s); }}
+                className="flex w-full items-center gap-2 rounded-xl bg-primary px-3 py-2 text-xs font-black text-primary-foreground">
+                <Mic className="h-4 w-4" /> اصعد على المقعد
+              </button>
+            )}
+            <button onClick={() => staffLock(menuFor)} className="flex w-full items-center gap-2 rounded-xl bg-secondary px-3 py-2 text-xs font-black">
+              <Lock className="h-4 w-4" /> {menuFor.is_locked ? "فتح المقعد" : "قفل المقعد"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {menuFor && menuFor.user_id && (
         <div className="fixed inset-0 z-50 flex items-end bg-black/70" onClick={() => setMenuFor(null)}>
           <div className="mx-auto w-full max-w-lg space-y-2 rounded-t-3xl border border-border bg-card p-4" onClick={(e) => e.stopPropagation()}>
             <p className="mb-1 text-center text-sm font-black">{profileOf(menuFor.user_id)?.username ?? "عضو"}</p>
@@ -418,15 +435,26 @@ function RoomPage() {
         </div>
       )}
 
-      {giftFor && (
+      {giftFor !== null && (
         <div className="fixed inset-0 z-50 flex items-end bg-black/70" onClick={() => setGiftFor(null)}>
           <div
             className="mx-auto w-full max-w-lg rounded-t-3xl border border-border bg-card p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="mb-3 text-center text-sm font-black">
-              إهداء إلى {profileOf(giftFor)?.username ?? "عضو"}
+            <p className="mb-2 text-center text-sm font-black">
+              {giftFor ? `إهداء إلى ${profileOf(giftFor)?.username ?? "عضو"}` : "اختر من تريد إهداءه"}
             </p>
+            <div className="mb-3 flex flex-wrap justify-center gap-2">
+              {seatUserIds.filter((id) => id !== user?.id).map((id) => (
+                <button key={id} onClick={() => setGiftFor(id)}
+                  className={`rounded-full px-3 py-1 text-[11px] font-bold ${giftFor === id ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
+                  {profileOf(id)?.username ?? "عضو"}
+                </button>
+              ))}
+              {seatUserIds.filter((id) => id !== user?.id).length === 0 && (
+                <p className="text-[11px] text-muted-foreground">لا يوجد أحد على المقاعد لإهدائه حالياً</p>
+              )}
+            </div>
             <div className="grid grid-cols-4 gap-3">
               {(gifts.data ?? []).map((g) => (
                 <button

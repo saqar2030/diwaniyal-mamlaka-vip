@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791025126278,
+      "tag": "0000_gifts_grants_family_admin_seats",
+      "breakpoints": true
+    }
+  ]
+}
