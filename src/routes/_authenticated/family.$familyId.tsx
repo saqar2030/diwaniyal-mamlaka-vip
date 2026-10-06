@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ChatComposer, MessageBody, type OutgoingMessage } from "@/components/ChatComposer";
-import { ArrowRight, Check, X } from "lucide-react";
+import { FamilySettings } from "@/components/FamilySettings";
+import { ArrowRight, Check, X, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/family/$familyId")({
   component: FamilyChatPage,
