@@ -89,7 +89,15 @@ function FamilyChatPage() {
             {(members.data ?? []).filter((m: any) => m.status === "approved").length} عضو
           </p>
         </div>
+        {isStaff && (
+          <button onClick={() => setShowSettings(true)} className="rounded-full bg-secondary p-2" aria-label="إدارة القروب">
+            <Settings className="h-4 w-4 text-primary" />
+          </button>
+        )}
       </header>
+      {family.data?.description ? (
+        <p className="border-b border-border px-4 py-2 text-[11px] text-muted-foreground">{family.data.description}</p>
+      ) : null}
 
       {family.data?.banner_url ? (
         <img
@@ -99,7 +107,7 @@ function FamilyChatPage() {
         />
       ) : null}
 
-      {isOwner && pending.length > 0 && (
+      {isStaff && pending.length > 0 && (
         <div className="space-y-2 border-b border-border px-4 py-3">
           <p className="text-xs font-black text-primary">طلبات الانضمام</p>
           {pending.map((m: any) => (
@@ -132,6 +140,10 @@ function FamilyChatPage() {
       <div className="sticky bottom-0 border-t border-border bg-card/95 px-3 py-2 backdrop-blur">
         <ChatComposer userId={user?.id} onSend={send} placeholder="رسالة للقروب…" />
       </div>
+      {showSettings && family.data && user && (
+        <FamilySettings family={family.data} members={members.data ?? []} userId={user.id} canManage={canManage}
+          onClose={() => setShowSettings(false)} onChanged={() => { family.refetch(); members.refetch(); }} />
+      )}
     </div>
   );
 }
