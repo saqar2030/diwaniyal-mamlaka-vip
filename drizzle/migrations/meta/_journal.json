@@ -8,6 +8,13 @@
       "when": 1791025126278,
       "tag": "0000_gifts_grants_family_admin_seats",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791274274903,
+      "tag": "0001_block_banned_family_join",
+      "breakpoints": true
     }
   ]
 }
