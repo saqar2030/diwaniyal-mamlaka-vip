@@ -55,8 +55,12 @@ function FamilyChatPage() {
 
   useEffect(() => { end.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.data]);
 
+  const myRole = (members.data ?? []).find((m: any) => m.user_id === user?.id && m.status === "approved")?.role;
   const isOwner = family.data?.owner_id === user?.id;
+  const canManage = isOwner || myRole === "manager";
+  const isStaff = canManage || myRole === "moderator";
   const pending = (members.data ?? []).filter((m: any) => m.status === "pending");
+  const [showSettings, setShowSettings] = useState(false);
 
   async function send(m: OutgoingMessage) {
     if (!user) return;
