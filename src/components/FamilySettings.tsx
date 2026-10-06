@@ -34,14 +34,14 @@ export function FamilySettings({
 
   async function save() {
     const { error } = await supabase.from("families").update({ name, description: desc, banner_url: banner || null }).eq("id", family.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("تم حفظ القروب");
     onChanged();
   }
 
   async function setRole(uid: string, role: string) {
     const { error } = await supabase.from("family_members").update({ role }).eq("family_id", family.id).eq("user_id", uid);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     onChanged();
   }
 
