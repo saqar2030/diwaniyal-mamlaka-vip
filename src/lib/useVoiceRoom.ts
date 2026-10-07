@@ -17,6 +17,8 @@ const ICE: RTCConfiguration = {
 export function useVoiceRoom(roomId: string, userId: string | undefined, onMic: boolean) {
   const [micOn, setMicOn] = useState(false);
   const [speaking, setSpeaking] = useState<Record<string, boolean>>({});
+  const [camOn, setCamOn] = useState(false);
+  const [videos, setVideos] = useState<Record<string, MediaStream>>({});
   const localStream = useRef<MediaStream | null>(null);
   const peers = useRef<PeerMap>({});
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
@@ -27,6 +29,7 @@ export function useVoiceRoom(roomId: string, userId: string | undefined, onMic: 
     delete peers.current[id];
     audioEls.current[id]?.remove();
     delete audioEls.current[id];
+    setVideos((v) => { const n = { ...v }; delete n[id]; return n; });
     setSpeaking((s) => {
       const n = { ...s };
       delete n[id];
@@ -39,6 +42,8 @@ export function useVoiceRoom(roomId: string, userId: string | undefined, onMic: 
     localStream.current = null;
     Object.keys(peers.current).forEach(cleanupPeer);
     setMicOn(false);
+    setCamOn(false);
+    setVideos({});
   }, [cleanupPeer]);
 
   const createPeer = useCallback(
@@ -60,6 +65,15 @@ export function useVoiceRoom(roomId: string, userId: string | undefined, onMic: 
       };
 
       pc.ontrack = (e) => {
+        const stream = e.streams[0]!;
+        if (e.track.kind === "video") {
+          setVideos((v) => ({ ...v, [peerId]: stream }));
+          e.track.addEventListener("ended", () => setVideos((v) => { const n = { ...v }; delete n[peerId]; return n; }));
+          stream.addEventListener("removetrack", () => {
+            if (stream.getVideoTracks().length === 0) setVideos((v) => { const n = { ...v }; delete n[peerId]; return n; });
+          });
+          return;
+        }
         let el = audioEls.current[peerId];
         if (!el) {
           el = document.createElement("audio");
@@ -72,8 +86,10 @@ export function useVoiceRoom(roomId: string, userId: string | undefined, onMic: 
         monitorLevel(e.streams[0]!, peerId);
       };
 
-      if (initiator) {
+      void initiator;
+      {
         pc.onnegotiationneeded = async () => {
+          if (pc.signalingState !== "stable") return;
           const offer = await pc.createOffer();
           await pc.setLocalDescription(offer);
           channelRef.current?.send({
@@ -131,6 +147,34 @@ export function useVoiceRoom(roomId: string, userId: string | undefined, onMic: 
     }
   }, [monitorLevel, userId]);
 
+  const toggleCam = useCallback(async () => {
+    const stream = localStream.current;
+    if (!stream) return false;
+    const current = stream.getVideoTracks()[0];
+    if (current) {
+      current.stop();
+      stream.removeTrack(current);
+      Object.values(peers.current).forEach((pc) => {
+        pc.getSenders().forEach((s) => { if (s.track === current || s.track?.kind === "video") pc.removeTrack(s); });
+      });
+      setCamOn(false);
+      if (userId) setVideos((v) => { const n = { ...v }; delete n[userId]; return n; });
+      channelRef.current?.send({ type: "broadcast", event: "cam-off", payload: { from: userId } });
+      return true;
+    }
+    try {
+      const cam = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 320, facingMode: "user" } });
+      const track = cam.getVideoTracks()[0]!;
+      stream.addTrack(track);
+      Object.values(peers.current).forEach((pc) => pc.addTrack(track, stream));
+      setCamOn(true);
+      if (userId) setVideos((v) => ({ ...v, [userId]: new MediaStream([track]) }));
+      return true;
+    } catch {
+      return false;
+    }
+  }, [userId]);
+
   const toggleMute = useCallback(() => {
     const track = localStream.current?.getAudioTracks()[0];
     if (!track) return;
@@ -173,6 +217,8 @@ export function useVoiceRoom(roomId: string, userId: string | undefined, onMic: 
           await pc.addIceCandidate(new RTCIceCandidate(data)).catch(() => {});
         }
       })
+      .on("broadcast", { event: "cam-off" }, ({ payload }) =>
+        setVideos((v) => { const n = { ...v }; delete n[payload.from]; return n; }))
       .on("broadcast", { event: "voice-leave" }, ({ payload }) => cleanupPeer(payload.from))
       .subscribe();
 
@@ -192,5 +238,5 @@ export function useVoiceRoom(roomId: string, userId: string | undefined, onMic: 
     }
   }, [onMic, startMic, stopMic, userId]);
 
-  return { micOn, speaking, toggleMute };
+  return { micOn, speaking, toggleMute, camOn, toggleCam, videos };
 }

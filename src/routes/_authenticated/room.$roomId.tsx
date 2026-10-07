@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useVoiceRoom } from "@/lib/useVoiceRoom";
 import { formatCoins } from "@/lib/queries";
 import { RoomSettings, type RoomRow } from "@/components/RoomSettings";
-import { ArrowRight, Gift, Mic, MicOff, Send, LogOut, Settings, Lock, Ban, VolumeX, Volume2, User, Coins } from "lucide-react";
+import { ArrowRight, Gift, Mic, MicOff, Send, LogOut, Settings, Lock, Ban, VolumeX, Volume2, User, Coins, Video, VideoOff } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/room/$roomId")({
   component: RoomPage,
@@ -326,7 +326,9 @@ function RoomPage() {
                   seat.user_id ? "gold-ring" : ""
                 } ${isSpeaking ? "speaking-glow" : ""}`}
               >
-                {p?.avatar_url ? (
+                {seat.user_id && voice.videos[seat.user_id] ? (
+                  <SeatVideo stream={voice.videos[seat.user_id]!} muted />
+                ) : p?.avatar_url ? (
                   <img src={p.avatar_url} alt={p.username} className="h-full w-full object-cover" />
                 ) : seat.user_id ? (
                   "👤"
@@ -374,6 +376,15 @@ function RoomPage() {
         >
           {mySeat && !mySeat.is_muted ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
         </button>
+        {mySeat && (
+          <button
+            onClick={async () => { const ok = await voice.toggleCam(); if (!ok) toast.error("ما قدرنا نشغل الكاميرا، اسمح للمتصفح باستخدامها"); }}
+            className={`rounded-full p-2.5 ${voice.camOn ? "bg-primary text-primary-foreground" : "bg-secondary"}`}
+            aria-label="الكاميرا"
+          >
+            {voice.camOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
+          </button>
+        )}
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -488,4 +499,15 @@ function RoomPage() {
       )}
     </div>
   );
+}
+
+function SeatVideo({ stream, muted }: { stream: MediaStream; muted?: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    if (ref.current && ref.current.srcObject !== stream) {
+      ref.current.srcObject = stream;
+      ref.current.play().catch(() => {});
+    }
+  }, [stream]);
+  return <video ref={ref} autoPlay playsInline muted={muted} className="h-full w-full object-cover" />;
 }
