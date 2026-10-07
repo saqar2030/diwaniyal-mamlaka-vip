@@ -107,6 +107,8 @@ export function FamilySettings({
               </div>
             </div>
           ))}
+          <p className="pt-1 text-[11px] font-black text-muted-foreground">المطرودين (سحب الطرد)</p>
+          {(bans.data ?? []).length === 0 && <p className="text-[11px] text-muted-foreground">لا يوجد أحد مطرود</p>}
           {(bans.data ?? []).map((b: any) => (
             <div key={b.id} className="flex items-center justify-between rounded-xl bg-destructive/15 px-3 py-1.5 text-[11px]">
               <span className="font-bold">مطرود: {b.profiles?.username}</span>
