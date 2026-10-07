@@ -1,89 +1,80 @@
-import React, { useState } from 'react';
-import { Award, Zap, ChevronUp } from 'lucide-react';
+import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Award, Zap, ChevronUp } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
-interface UserStats {
-  xp: number;
-  level: number;
-  messagesCount: number;
-}
-
+/** بطاقة المستوى الحقيقية — تتحدث تلقائيًا من السيرفر مع كل تفاعل */
 export default function UserLevels() {
-  // محاكاة بيانات مستوى المستخدم ونقاطه (تتحدث تلقائيًا مع تفاعله)
-  const [stats, setStats] = useState<UserStats>({
-    xp: 240,
-    level: 3,
-    messagesCount: 45
+  const { user } = useAuth();
+  const [levelUp, setLevelUp] = useState<number | null>(null);
+  const prevLevel = useRef<number | null>(null);
+
+  const stats = useQuery({
+    queryKey: ["my-level", user?.id],
+    enabled: !!user,
+    refetchInterval: 8000,
+    queryFn: async () => {
+      const [lv, rm, dm, fm] = await Promise.all([
+        supabase.from("user_levels").select("xp_points, current_level").eq("user_id", user!.id).maybeSingle(),
+        supabase.from("room_messages").select("id", { count: "exact", head: true }).eq("user_id", user!.id),
+        supabase.from("direct_messages").select("id", { count: "exact", head: true }).eq("sender_id", user!.id),
+        supabase.from("family_messages").select("id", { count: "exact", head: true }).eq("user_id", user!.id),
+      ]);
+      return {
+        xp: lv.data?.xp_points ?? 0,
+        level: lv.data?.current_level ?? 1,
+        messages: (rm.count ?? 0) + (dm.count ?? 0) + (fm.count ?? 0),
+      };
+    },
   });
 
-  const [showLevelUp, setShowLevelUp] = useState(false);
-
-  // حساب النقاط المطلوبة للانتقال للمستوى التالي (معادلة تفاعلية)
-  const xpNeededForNextLevel = stats.level * 150;
-  const progressPercentage = Math.min((stats.xp / xpNeededForNextLevel) * 100, 100);
-
-  // دالة محاكاة لكسب النقاط عند التفاعل أو إرسال رسالة
-  const simulateNewMessage = () => {
-    let newXp = stats.xp + 25; // يحصل على 25 نقطة لكل رسالة
-    let newLevel = stats.level;
-
-    if (newXp >= xpNeededForNextLevel) {
-      newXp = newXp - xpNeededForNextLevel;
-      newLevel += 1;
-      setShowLevelUp(true);
-      // إخفاء إشعار الترقية بعد 4 ثوانٍ
-      setTimeout(() => setShowLevelUp(false), 4000);
+  const level = stats.data?.level ?? 1;
+  useEffect(() => {
+    if (!stats.data) return undefined;
+    if (prevLevel.current !== null && level > prevLevel.current) {
+      setLevelUp(level);
+      const t = setTimeout(() => setLevelUp(null), 4000);
+      prevLevel.current = level;
+      return () => clearTimeout(t);
     }
+    prevLevel.current = level;
+    return undefined;
+  }, [level, stats.data]);
 
-    setStats({
-      xp: newXp,
-      level: newLevel,
-      messagesCount: stats.messagesCount + 1
-    });
-  };
+  if (!user) return null;
+
+  const xp = stats.data?.xp ?? 0;
+  const needed = level * 100;
+  const pct = Math.min((xp / needed) * 100, 100);
+  const msgs = stats.data?.messages ?? 0;
+  const power = msgs >= 200 ? "أسطوري" : msgs >= 50 ? "نشط جداً" : msgs >= 10 ? "نشط" : "مبتدئ";
 
   return (
-    <div style={{ maxWidth: '340px', background: '#1e272e', color: '#fff', padding: '15px', borderRadius: '12px', direction: 'rtl', fontFamily: 'sans-serif', margin: '15px auto', boxShadow: '0 4px 15px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', position: 'relative' }}>
-      
-      {/* تأثير صعود المستوى (Level Up Alert) */}
-      {showLevelUp && (
-        <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(45deg, #f1c40f, #e67e22)', color: '#000', padding: '6px 15px', borderRadius: '20px', fontWeight: 'bold', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px', boxShadow: '0 4px 10px rgba(241,196,15,0.5)', zIndex: 10 }}>
-          <ChevronUp size={16} /> مبروك! صعدت للمستوى {stats.level} 🔥
+    <div className="relative mx-4 my-3 rounded-2xl border border-border bg-card p-4">
+      {levelUp && (
+        <div className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-primary px-3 py-1 text-[11px] font-black text-primary-foreground">
+          <ChevronUp className="h-3.5 w-3.5" /> مبروك! صعدت للمستوى {levelUp} 🔥
         </div>
       )}
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-        <div style={{ background: '#f1c40f', color: '#000', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Award size={20} />
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <h4 style={{ margin: 0, fontSize: '15px', color: '#f1c40f' }}>رتبة العضوية والمستويات</h4>
-          <span style={{ fontSize: '11px', color: '#aaa' }}>تفاعل بالرومات لترفع لفلك</span>
+      <div className="mb-3 flex items-center gap-2">
+        <div className="rounded-full bg-primary p-2 text-primary-foreground"><Award className="h-5 w-5" /></div>
+        <div>
+          <h4 className="gold-text text-sm font-black">رتبة العضوية والمستويات</h4>
+          <p className="text-[10px] text-muted-foreground">تصعد تلقائيًا مع كل رسالة ومنشور وتعليق وهدية</p>
         </div>
       </div>
-
-      {/* تفاصيل المستوى الحالي */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', fontSize: '13px' }}>
-        <div>المستوى الحركي: <b style={{ color: '#f1c40f', fontSize: '16px' }}>{stats.level}</b></div>
-        <div style={{ color: '#aaa', fontSize: '12px' }}>{stats.xp} / {xpNeededForNextLevel} XP</div>
+      <div className="mb-1.5 flex items-center justify-between text-xs">
+        <span>المستوى: <b className="text-base text-primary">{level}</b></span>
+        <span className="text-muted-foreground">{xp} / {needed} XP</span>
       </div>
-
-      {/* شريط التقدم (Progress Bar) */}
-      <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden', marginBottom: '12px' }}>
-        <div style={{ width: `${progressPercentage}%`, height: '100%', background: 'linear-gradient(90deg, #f1c40f, #f39c12)', borderRadius: '4px', transition: 'width 0.4s ease' }} />
+      <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
+        <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
       </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '6px', fontSize: '12px', color: '#ddd', marginBottom: '10px' }}>
-        <div>💬 رسائلك: <b>{stats.messagesCount}</b></div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Zap size={12} color="#f1c40f" /> قوة التفاعل: <b>نشط جداً</b></div>
+      <div className="flex justify-between rounded-xl bg-secondary px-3 py-2 text-[11px]">
+        <span>💬 رسائلك: <b>{msgs}</b></span>
+        <span className="flex items-center gap-1"><Zap className="h-3 w-3 text-primary" /> قوة التفاعل: <b>{power}</b></span>
       </div>
-
-      {/* زر محاكاة تجريبي لكسب النقاط ورؤية لفل أب */}
-      <button 
-        onClick={simulateNewMessage}
-        style={{ width: '100%', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px dashed rgba(255,255,255,0.2)', padding: '6px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px' }}
-      >
-        ⚡ اضغط لمحاكاة إرسال رسالة وكسب +25 XP
-      </button>
     </div>
   );
 }
