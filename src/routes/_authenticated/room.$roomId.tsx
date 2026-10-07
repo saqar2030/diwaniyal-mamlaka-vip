@@ -125,6 +125,14 @@ function RoomPage() {
 
   const isOwner = room.data?.owner_id === user?.id;
   const isStaff = isOwner || Boolean(staff.data);
+  const giftTargets = (() => {
+    const map = new Map<string, string>();
+    seatUserIds.forEach((id) => map.set(id, profileOf(id)?.username ?? "عضو"));
+    (messages.data ?? []).forEach((m: any) => { if (!map.has(m.user_id)) map.set(m.user_id, m.profiles?.username ?? "عضو"); });
+    if (room.data?.owner_id && !map.has(room.data.owner_id)) map.set(room.data.owner_id, "صاحب الغرفة");
+    if (user?.id) map.delete(user.id);
+    return [...map.entries()].map(([id, name]) => ({ id, name }));
+  })();
   const mySeat = (seats.data ?? []).find((s) => s.user_id === user?.id);
   const voice = useVoiceRoom(roomId, user?.id, Boolean(mySeat) && !mySeat?.is_muted);
 
@@ -214,7 +222,7 @@ function RoomPage() {
   }
 
   async function sendGift(giftId: string) {
-    if (!giftFor) return;
+    if (!giftFor) { toast.error(giftTargets.length ? "اختر الشخص أولاً من الأعلى" : "لا يوجد أحد غيرك في الغرفة"); return; }
     const { error } = await supabase.rpc("send_gift", {
       _gift_id: giftId,
       _receiver_id: giftFor,
@@ -373,7 +381,7 @@ function RoomPage() {
           placeholder="اكتب رسالتك…"
           className="flex-1 rounded-full border border-border bg-input px-4 py-2 text-xs outline-none focus:border-primary"
         />
-        <button onClick={() => setGiftFor(seatUserIds.find((id) => id !== user?.id) ?? "")} className="rounded-full bg-secondary p-2.5">
+        <button onClick={() => setGiftFor(giftTargets.length === 1 ? giftTargets[0].id : "")} className="rounded-full bg-secondary p-2.5">
           <Gift className="h-4 w-4 text-primary" />
         </button>
         <button onClick={send} className="rounded-full bg-primary p-2.5 text-primary-foreground">
@@ -442,19 +450,22 @@ function RoomPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <p className="mb-2 text-center text-sm font-black">
-              {giftFor ? `إهداء إلى ${profileOf(giftFor)?.username ?? "عضو"}` : "اختر من تريد إهداءه"}
+              {giftFor ? `إهداء إلى ${giftTargets.find((t) => t.id === giftFor)?.name ?? profileOf(giftFor)?.username ?? "عضو"}` : "اختر من تريد إهداءه"}
             </p>
             <div className="mb-3 flex flex-wrap justify-center gap-2">
-              {seatUserIds.filter((id) => id !== user?.id).map((id) => (
-                <button key={id} onClick={() => setGiftFor(id)}
-                  className={`rounded-full px-3 py-1 text-[11px] font-bold ${giftFor === id ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
-                  {profileOf(id)?.username ?? "عضو"}
+              {giftTargets.map((t) => (
+                <button key={t.id} onClick={() => setGiftFor(t.id)}
+                  className={`rounded-full px-3 py-1 text-[11px] font-bold ${giftFor === t.id ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
+                  {t.name}
                 </button>
               ))}
-              {seatUserIds.filter((id) => id !== user?.id).length === 0 && (
-                <p className="text-[11px] text-muted-foreground">لا يوجد أحد على المقاعد لإهدائه حالياً</p>
+              {giftTargets.length === 0 && (
+                <p className="text-[11px] text-muted-foreground">لا يوجد أحد غيرك في الغرفة لإهدائه حالياً</p>
               )}
             </div>
+            <Link to="/wallet" className="mb-3 flex items-center justify-center gap-1 rounded-xl bg-primary/15 py-2 text-[11px] font-black text-primary">
+              <Coins className="h-3.5 w-3.5" /> شحن العملات بالريال السعودي
+            </Link>
             <div className="grid grid-cols-4 gap-3">
               {(gifts.data ?? []).map((g) => (
                 <button
