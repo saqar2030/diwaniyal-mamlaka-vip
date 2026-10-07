@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useVoiceRoom } from "@/lib/useVoiceRoom";
 import { formatCoins } from "@/lib/queries";
 import { RoomSettings, type RoomRow } from "@/components/RoomSettings";
-import { ArrowRight, Gift, Mic, MicOff, Send, LogOut, Settings, Lock, Ban, VolumeX, Volume2, User } from "lucide-react";
+import { ArrowRight, Gift, Mic, MicOff, Send, LogOut, Settings, Lock, Ban, VolumeX, Volume2, User, Coins } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/room/$roomId")({
   component: RoomPage,
@@ -125,14 +125,6 @@ function RoomPage() {
 
   const isOwner = room.data?.owner_id === user?.id;
   const isStaff = isOwner || Boolean(staff.data);
-  const giftTargets = (() => {
-    const map = new Map<string, string>();
-    seatUserIds.forEach((id) => map.set(id, profileOf(id)?.username ?? "عضو"));
-    (messages.data ?? []).forEach((m: any) => { if (!map.has(m.user_id)) map.set(m.user_id, m.profiles?.username ?? "عضو"); });
-    if (room.data?.owner_id && !map.has(room.data.owner_id)) map.set(room.data.owner_id, "صاحب الغرفة");
-    if (user?.id) map.delete(user.id);
-    return [...map.entries()].map(([id, name]) => ({ id, name }));
-  })();
   const mySeat = (seats.data ?? []).find((s) => s.user_id === user?.id);
   const voice = useVoiceRoom(roomId, user?.id, Boolean(mySeat) && !mySeat?.is_muted);
 
@@ -240,6 +232,14 @@ function RoomPage() {
   }
 
   const profileOf = (id: string | null) => (people.data ?? []).find((p) => p.id === id);
+  const giftTargets = (() => {
+    const map = new Map<string, string>();
+    seatUserIds.forEach((id) => map.set(id, profileOf(id)?.username ?? "عضو"));
+    (messages.data ?? []).forEach((m: any) => { if (!map.has(m.user_id)) map.set(m.user_id, m.profiles?.username ?? "عضو"); });
+    if (room.data?.owner_id && !map.has(room.data.owner_id)) map.set(room.data.owner_id, "صاحب الغرفة");
+    if (user?.id) map.delete(user.id);
+    return [...map.entries()].map(([id, name]) => ({ id, name }));
+  })();
 
   if (banned.data) {
     return (
