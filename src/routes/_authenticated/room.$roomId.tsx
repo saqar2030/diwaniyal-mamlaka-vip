@@ -381,7 +381,7 @@ function RoomPage() {
           placeholder="اكتب رسالتك…"
           className="flex-1 rounded-full border border-border bg-input px-4 py-2 text-xs outline-none focus:border-primary"
         />
-        <button onClick={() => setGiftFor(giftTargets.length === 1 ? giftTargets[0].id : "")} className="rounded-full bg-secondary p-2.5">
+        <button onClick={() => setGiftFor(giftTargets.length === 1 ? giftTargets[0]!.id : "")} className="rounded-full bg-secondary p-2.5">
           <Gift className="h-4 w-4 text-primary" />
         </button>
         <button onClick={send} className="rounded-full bg-primary p-2.5 text-primary-foreground">
