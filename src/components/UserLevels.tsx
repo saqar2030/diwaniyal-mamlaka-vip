@@ -31,7 +31,7 @@ export default function UserLevels() {
 
   const level = stats.data?.level ?? 1;
   useEffect(() => {
-    if (!stats.data) return;
+    if (!stats.data) return undefined;
     if (prevLevel.current !== null && level > prevLevel.current) {
       setLevelUp(level);
       const t = setTimeout(() => setLevelUp(null), 4000);
@@ -39,6 +39,7 @@ export default function UserLevels() {
       return () => clearTimeout(t);
     }
     prevLevel.current = level;
+    return undefined;
   }, [level, stats.data]);
 
   if (!user) return null;
