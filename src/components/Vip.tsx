@@ -20,7 +20,7 @@ export const ENTRIES: Record<string, { emoji: string; label: string }> = {
 
 export function FramedAvatar({
   src, frame, size = 56, children, className = "",
-}: { src?: string | null; frame?: string | null; size?: number; children?: React.ReactNode; className?: string }) {
+}: { src?: string | null | undefined; frame?: string | null | undefined; size?: number; children?: React.ReactNode; className?: string | undefined }) {
   const f = frame ? FRAMES[frame] : undefined;
   return (
     <div className={`relative shrink-0 ${className}`} style={{ width: size, height: size }}>
@@ -37,7 +37,7 @@ export function FramedAvatar({
   );
 }
 
-export function VipBadge({ level }: { level?: number | null }) {
+export function VipBadge({ level }: { level?: number | null | undefined }) {
   if (!level) return null;
   return (
     <span className="vip-badge mx-1 inline-flex items-center gap-0.5 rounded-full px-1.5 py-[1px] align-middle text-[9px] font-black">
@@ -47,7 +47,7 @@ export function VipBadge({ level }: { level?: number | null }) {
 }
 
 export function EntryOverlay({ entry, name, onDone }: { entry: string; name: string; onDone: () => void }) {
-  const e = ENTRIES[entry] ?? ENTRIES.royal;
+  const e = ENTRIES[entry] ?? { emoji: "👑", label: "دخول ملكي" };
   useEffect(() => { const t = setTimeout(onDone, 4000); return () => clearTimeout(t); }, [onDone]);
   return (
     <div className="pointer-events-none fixed inset-x-0 top-1/3 z-50 flex justify-center">

@@ -37,12 +37,12 @@ function StorePage() {
 
   async function buy(id: string) {
     const { error } = await supabase.rpc("buy_store_item", { _item: id });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("تم الشراء والتفعيل 👑"); refresh();
   }
   async function equip(kind: string, code: string | null) {
     const { error } = await supabase.rpc("equip_store_item", { _kind: kind, _code: code as string });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(code ? "تم التفعيل" : "تم الإلغاء"); refresh();
   }
 
