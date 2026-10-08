@@ -20,6 +20,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedGamesRouteImport } from './routes/_authenticated/games'
 import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
+import { Route as AuthenticatedStoreRouteImport } from './routes/_authenticated/store'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as AuthenticatedFamilyFamilyIdRouteImport } from './routes/_authenticated/family.$familyId'
@@ -79,6 +80,11 @@ const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStoreRoute = AuthenticatedStoreRouteImport.update({
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/games': typeof AuthenticatedGamesRoute
   '/me': typeof AuthenticatedMeRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/store': typeof AuthenticatedStoreRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/games': typeof AuthenticatedGamesRoute
   '/me': typeof AuthenticatedMeRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/store': typeof AuthenticatedStoreRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated/games': typeof AuthenticatedGamesRoute
   '/_authenticated/me': typeof AuthenticatedMeRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
+  '/_authenticated/store': typeof AuthenticatedStoreRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/_authenticated/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/games'
     | '/me'
     | '/messages'
+    | '/store'
     | '/wallet'
     | '/profile/$userId'
     | '/family/$familyId'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/games'
     | '/me'
     | '/messages'
+    | '/store'
     | '/wallet'
     | '/profile/$userId'
     | '/family/$familyId'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/_authenticated/games'
     | '/_authenticated/me'
     | '/_authenticated/messages'
+    | '/_authenticated/store'
     | '/_authenticated/wallet'
     | '/profile/$userId'
     | '/_authenticated/family/$familyId'
@@ -293,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/store': {
+      id: '/_authenticated/store'
+      path: '/store'
+      fullPath: '/store'
+      preLoaderRoute: typeof AuthenticatedStoreRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/wallet': {
       id: '/_authenticated/wallet'
       path: '/wallet'
@@ -329,6 +348,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGamesRoute: typeof AuthenticatedGamesRoute
   AuthenticatedMeRoute: typeof AuthenticatedMeRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedStoreRoute: typeof AuthenticatedStoreRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedFamilyFamilyIdRoute: typeof AuthenticatedFamilyFamilyIdRoute
   AuthenticatedRoomRoomIdRoute: typeof AuthenticatedRoomRoomIdRoute
@@ -339,6 +359,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGamesRoute: AuthenticatedGamesRoute,
   AuthenticatedMeRoute: AuthenticatedMeRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedStoreRoute: AuthenticatedStoreRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedFamilyFamilyIdRoute: AuthenticatedFamilyFamilyIdRoute,
   AuthenticatedRoomRoomIdRoute: AuthenticatedRoomRoomIdRoute,

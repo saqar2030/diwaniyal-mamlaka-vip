@@ -1,3 +1,4 @@
+import { FramedAvatar, VipBadge, EntryOverlay, ENTRIES } from "@/components/Vip";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -93,7 +94,7 @@ function RoomPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, avatar_url, coins")
+        .select("id, username, avatar_url, coins, vip_level, active_frame")
         .in("id", seatUserIds);
       if (error) throw error;
       return data ?? [];
@@ -105,7 +106,7 @@ function RoomPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("room_messages")
-        .select("*, profiles:user_id(username, avatar_url)")
+        .select("*, profiles:user_id(username, avatar_url, vip_level, active_frame, active_entry)")
         .eq("room_id", roomId)
         .order("created_at")
         .limit(100);
@@ -134,9 +135,14 @@ function RoomPage() {
       .on("postgres_changes", { event: "*", schema: "public", table: "room_seats", filter: `room_id=eq.${roomId}` }, () =>
         qc.invalidateQueries({ queryKey: ["seats", roomId] }),
       )
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "room_messages", filter: `room_id=eq.${roomId}` }, () =>
-        qc.invalidateQueries({ queryKey: ["room-messages", roomId] }),
-      )
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "room_messages", filter: `room_id=eq.${roomId}` }, async (p) => {
+        qc.invalidateQueries({ queryKey: ["room-messages", roomId] });
+        const m = p.new as { kind: string; content: string; user_id: string };
+        if (m.kind === "entry") {
+          const { data: pr } = await supabase.from("profiles").select("username").eq("id", m.user_id).maybeSingle();
+          setEntryFx({ id: crypto.randomUUID(), entry: m.content, name: pr?.username ?? "عضو" });
+        }
+      })
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "gift_events", filter: `room_id=eq.${roomId}` }, async (p) => {
         const giftId = (p.new as { gift_id: string }).gift_id;
         const g = (gifts.data ?? []).find((x) => x.id === giftId);
@@ -155,6 +161,18 @@ function RoomPage() {
   useEffect(() => {
     chatEnd.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.data]);
+
+  // الدخول المميز
+  const [entryFx, setEntryFx] = useState<{ id: string; entry: string; name: string } | null>(null);
+  const entered = useRef(false);
+  useEffect(() => {
+    if (entered.current || !user) return;
+    entered.current = true;
+    void (async () => {
+      const { data } = await supabase.from("profiles").select("active_entry").eq("id", user.id).maybeSingle();
+      if (data?.active_entry) await supabase.from("room_messages").insert({ room_id: roomId, user_id: user.id, content: data.active_entry, kind: "entry" });
+    })();
+  }, [user, roomId]);
 
   // رسالة الترحيب
   const welcomed = useRef(false);
@@ -321,11 +339,7 @@ function RoomPage() {
               }}
               className="flex flex-col items-center gap-1"
             >
-              <div
-                className={`relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary text-xl ${
-                  seat.user_id ? "gold-ring" : ""
-                } ${isSpeaking ? "speaking-glow" : ""}`}
-              >
+              <FramedAvatar size={56} frame={(p as any)?.active_frame} className={`mt-2 ${isSpeaking ? "speaking-glow rounded-full" : ""}`}>
                 {seat.user_id && voice.videos[seat.user_id] ? (
                   <SeatVideo stream={voice.videos[seat.user_id]!} muted />
                 ) : p?.avatar_url ? (
@@ -340,13 +354,14 @@ function RoomPage() {
                 {seat.user_id && seat.is_muted ? (
                   <span className="absolute bottom-0 w-full bg-black/60 py-0.5"><MicOff className="mx-auto h-3 w-3 text-destructive" /></span>
                 ) : null}
-              </div>
+              </FramedAvatar>
               <span className="w-full truncate text-center text-[10px] font-bold">
-                {p?.username ?? `مقعد ${seat.seat_index}`}
+                {p?.username ?? `مقعد ${seat.seat_index}`}<VipBadge level={(p as any)?.vip_level} />
               </span>
             </button>
           );
         })}
+        {entryFx && <EntryOverlay key={entryFx.id} entry={entryFx.entry} name={entryFx.name} onDone={() => setEntryFx(null)} />}
         {flying && (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center text-5xl gift-fly">
             {flying.emoji}
@@ -355,13 +370,15 @@ function RoomPage() {
       </section>
 
       <section className="flex-1 space-y-2 overflow-y-auto border-t border-border bg-background/70 px-4 py-3 backdrop-blur-sm">
-        {(messages.data ?? []).map((m: any) => (
+        {(messages.data ?? []).map((m: any) => m.kind === "entry" ? (
+          <div key={m.id} className="vip-card mx-auto w-fit rounded-full px-3 py-1 text-[11px]">
+            {ENTRIES[m.content]?.emoji ?? "👑"} <b className="text-primary">{m.profiles?.username}</b><VipBadge level={m.profiles?.vip_level} /> دخل {ENTRIES[m.content]?.label ?? ""}
+          </div>
+        ) : (
           <div key={m.id} className="flex items-start gap-2">
-            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary text-xs">
-              {m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} alt="" className="h-full w-full object-cover" /> : "👤"}
-            </div>
-            <div className="rounded-2xl rounded-tr-sm bg-card px-3 py-1.5">
-              <p className="text-[10px] font-black text-primary">{m.profiles?.username ?? "عضو"}</p>
+            <FramedAvatar size={28} src={m.profiles?.avatar_url} frame={m.profiles?.active_frame} className="mt-2" />
+            <div className={`rounded-2xl rounded-tr-sm px-3 py-1.5 ${m.profiles?.vip_level >= 4 ? "vip-card" : "bg-card"}`}>
+              <p className="text-[10px] font-black text-primary">{m.profiles?.username ?? "عضو"}<VipBadge level={m.profiles?.vip_level} /></p>
               <p className="text-xs">{m.content}</p>
             </div>
           </div>

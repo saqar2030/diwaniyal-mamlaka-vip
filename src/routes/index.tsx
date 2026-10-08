@@ -62,6 +62,9 @@ function HomePage() {
           <p className="text-[10px] text-muted-foreground">غرف صوتية مباشرة</p>
         </div>
         <div className="flex items-center gap-2">
+          {user && (
+            <Link to="/store" className="vip-badge rounded-full px-2.5 py-1.5 text-[10px] font-black">👑 VIP</Link>
+          )}
           <Link to="/search" aria-label="بحث" className="rounded-full bg-secondary p-2">
             <Search className="h-4 w-4 text-primary" />
           </Link>

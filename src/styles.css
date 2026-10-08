@@ -210,3 +210,18 @@ body {
   from { object-position: 0% 50%; transform: scale(1.02); }
   to { object-position: 100% 50%; transform: scale(1.08); }
 }
+
+/* ===== VIP ===== */
+.frame-king{background:conic-gradient(#fde68a,#b45309,#fff7d6,#f59e0b,#7c2d12,#fde68a);box-shadow:0 0 14px 3px rgba(245,158,11,.75)}
+.frame-lion{background:conic-gradient(#f59e0b,#7c2d12,#fbbf24,#451a03,#f59e0b);box-shadow:0 0 12px rgba(245,158,11,.6)}
+.frame-ghazal{background:conic-gradient(#fbcfe8,#d4af37,#fff,#d4af37,#fbcfe8);box-shadow:0 0 10px rgba(244,114,182,.5)}
+.frame-gold{background:linear-gradient(135deg,#fde68a,#b45309,#fde68a)}
+.frame-diamond{background:conic-gradient(#e0f2fe,#60a5fa,#fff,#a78bfa,#e0f2fe);box-shadow:0 0 12px rgba(96,165,250,.6)}
+.frame-fire{background:conic-gradient(#fef08a,#ef4444,#f97316,#7f1d1d,#fef08a);box-shadow:0 0 12px rgba(239,68,68,.6)}
+.frame-spin{animation:frameSpin 4s linear infinite}
+@keyframes frameSpin{to{transform:rotate(360deg)}}
+.vip-badge{background:linear-gradient(90deg,#78350f,#f59e0b,#fde68a,#f59e0b,#78350f);background-size:200% 100%;color:#1c1003;animation:vipShine 2.5s linear infinite}
+@keyframes vipShine{to{background-position:200% 0}}
+.vip-card{background:linear-gradient(135deg,#1a1408,#0b0b0b 55%,#2a1f08);border:1px solid rgba(245,158,11,.45);box-shadow:0 0 24px rgba(245,158,11,.25)}
+.entry-slide{animation:entrySlide 4s ease-in-out forwards}
+@keyframes entrySlide{0%{transform:translateX(120%);opacity:0}15%{transform:translateX(0);opacity:1}85%{transform:translateX(0);opacity:1}100%{transform:translateX(-120%);opacity:0}}
