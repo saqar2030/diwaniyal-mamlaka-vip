@@ -172,6 +172,9 @@ function MePage() {
         </div>
 
         <div className="grid grid-cols-2 gap-2 text-[11px] font-black">
+          <Link to="/store" className="vip-badge col-span-2 flex items-center justify-center gap-1 rounded-xl py-2">
+            👑 متجر VIP — عضويات وإطارات ودخول مميز
+          </Link>
           <Link to="/wallet" className="flex items-center justify-center gap-1 rounded-xl bg-primary py-2 text-primary-foreground">
             <Coins className="h-4 w-4" /> شحن العملات
           </Link>
