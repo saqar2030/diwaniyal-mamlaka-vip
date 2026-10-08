@@ -491,6 +491,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          active_entry: string | null
+          active_frame: string | null
           age: number | null
           avatar_url: string | null
           bio: string | null
@@ -506,8 +508,12 @@ export type Database = {
           name_color: string | null
           updated_at: string
           username: string
+          vip_exp: number
+          vip_level: number
         }
         Insert: {
+          active_entry?: string | null
+          active_frame?: string | null
           age?: number | null
           avatar_url?: string | null
           bio?: string | null
@@ -523,8 +529,12 @@ export type Database = {
           name_color?: string | null
           updated_at?: string
           username: string
+          vip_exp?: number
+          vip_level?: number
         }
         Update: {
+          active_entry?: string | null
+          active_frame?: string | null
           age?: number | null
           avatar_url?: string | null
           bio?: string | null
@@ -540,6 +550,8 @@ export type Database = {
           name_color?: string | null
           updated_at?: string
           username?: string
+          vip_exp?: number
+          vip_level?: number
         }
         Relationships: []
       }
@@ -773,6 +785,72 @@ export type Database = {
           },
         ]
       }
+      store_items: {
+        Row: {
+          code: string
+          id: string
+          kind: string
+          name: string
+          price: number
+          sort_order: number
+          vip_level: number
+        }
+        Insert: {
+          code: string
+          id?: string
+          kind: string
+          name: string
+          price: number
+          sort_order?: number
+          vip_level?: number
+        }
+        Update: {
+          code?: string
+          id?: string
+          kind?: string
+          name?: string
+          price?: number
+          sort_order?: number
+          vip_level?: number
+        }
+        Relationships: []
+      }
+      user_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "store_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_levels: {
         Row: {
           current_level: number
@@ -827,7 +905,12 @@ export type Database = {
     Functions: {
       add_room_xp: { Args: { _pts: number; _room: string }; Returns: undefined }
       add_user_xp: { Args: { _pts: number; _user: string }; Returns: undefined }
+      buy_store_item: { Args: { _item: string }; Returns: undefined }
       claim_super_admin: { Args: { _pin: string }; Returns: boolean }
+      equip_store_item: {
+        Args: { _code: string; _kind: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
