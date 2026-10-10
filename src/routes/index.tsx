@@ -8,6 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { fetchRooms, fetchTopSupporters, formatCoins } from "@/lib/queries";
 import { Plus, Mic, Crown, Trophy, Search } from "lucide-react";
 import UserLevels from "@/components/UserLevels";
+import { DailyCheckInModal, useCheckin } from "@/components/DailyCheckIn";
+import { useEffect } from "react";
 
 
 
@@ -35,6 +37,14 @@ function HomePage() {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
 
+  const checkin = useCheckin();
+  const [showCheckin, setShowCheckin] = useState(false);
+  useEffect(() => {
+    if (checkin.data && !checkin.data.doneToday && !sessionStorage.getItem("checkin-shown")) {
+      sessionStorage.setItem("checkin-shown", "1");
+      setShowCheckin(true);
+    }
+  }, [checkin.data]);
   const rooms = useQuery({ queryKey: ["rooms"], queryFn: fetchRooms });
   const top = useQuery({ queryKey: ["top"], queryFn: fetchTopSupporters });
 
@@ -62,6 +72,9 @@ function HomePage() {
           <p className="text-[10px] text-muted-foreground">غرف صوتية مباشرة</p>
         </div>
         <div className="flex items-center gap-2">
+          {user && (
+            <Link to="/rewards" className="rounded-full bg-secondary px-2.5 py-1.5 text-[10px] font-black">🎁 يومي</Link>
+          )}
           {user && (
             <Link to="/store" className="vip-badge rounded-full px-2.5 py-1.5 text-[10px] font-black">👑 VIP</Link>
           )}
@@ -154,6 +167,7 @@ function HomePage() {
         )}
   </section>    
 <UserLevels />
+      {showCheckin && <DailyCheckInModal onClose={() => setShowCheckin(false)} />}
 
 </AppShell>
   );  
