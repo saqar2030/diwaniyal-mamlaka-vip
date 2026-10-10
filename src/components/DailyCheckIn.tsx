@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { X, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { TreasureChest } from "@/components/TreasureChest";
 
 export const CHECKIN_REWARDS = [5, 5, 5, 5, 10, 10, 100];
 
@@ -61,7 +62,9 @@ export function DailyCheckInModal({ onClose }: { onClose: () => void }) {
               <div key={i} className={`relative flex flex-col items-center rounded-2xl border p-2 ${i === 6 ? "col-span-2" : ""} ${
                 got ? "border-primary bg-primary/15" : next ? "border-primary bg-secondary shadow-[0_0_12px_hsl(var(--primary)/0.5)]" : "border-border bg-secondary/60"}`}>
                 <span className="text-[10px] text-muted-foreground">اليوم {i + 1}</span>
-                <span className="text-2xl">{i === 6 ? "🎁" : "🪙"}</span>
+                {i === 6
+                  ? <TreasureChest state={got ? "opened" : next ? "ready" : "locked"} className={`h-12 w-12 ${next ? "drop-shadow-[0_0_8px_rgba(246,211,101,0.8)]" : ""}`} />
+                  : <span className="text-2xl">🪙</span>}
                 <span className="text-[10px] font-black text-primary">{i === 6 ? `صندوق +${r}` : `x${r}`}</span>
                 {got && <span className="absolute -top-1 -left-1 rounded-full bg-primary p-0.5 text-primary-foreground"><Check className="h-3 w-3" /></span>}
               </div>
