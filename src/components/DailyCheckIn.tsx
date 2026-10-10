@@ -63,7 +63,7 @@ export function DailyCheckInModal({ onClose }: { onClose: () => void }) {
                 got ? "border-primary bg-primary/15" : next ? "border-primary bg-secondary shadow-[0_0_12px_hsl(var(--primary)/0.5)]" : "border-border bg-secondary/60"}`}>
                 <span className="text-[10px] text-muted-foreground">اليوم {i + 1}</span>
                 {i === 6
-                  ? <TreasureChest state={got ? "opened" : "ready"} className={`h-12 w-12 ${next ? "drop-shadow-[0_0_8px_rgba(246,211,101,0.8)]" : ""}`} />
+                  ? <TreasureChest state={got ? "opened" : next ? "ready" : "locked"} className={`h-12 w-12 ${next ? "drop-shadow-[0_0_8px_rgba(246,211,101,0.8)]" : ""}`} />
                   : <span className="text-2xl">🪙</span>}
                 <span className="text-[10px] font-black text-primary">{i === 6 ? `صندوق +${r}` : `x${r}`}</span>
                 {got && <span className="absolute -top-1 -left-1 rounded-full bg-primary p-0.5 text-primary-foreground"><Check className="h-3 w-3" /></span>}
