@@ -14,6 +14,32 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_claims: {
+        Row: {
+          day: string
+          tier: number
+          user_id: string
+        }
+        Insert: {
+          day: string
+          tier: number
+          user_id: string
+        }
+        Update: {
+          day?: string
+          tier?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_claims_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           key: string
@@ -112,6 +138,35 @@ export type Database = {
           user_b?: string
         }
         Relationships: []
+      }
+      daily_checkins: {
+        Row: {
+          day: string
+          reward: number
+          streak: number
+          user_id: string
+        }
+        Insert: {
+          day: string
+          reward: number
+          streak: number
+          user_id: string
+        }
+        Update: {
+          day?: string
+          reward?: number
+          streak?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_checkins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       direct_messages: {
         Row: {
@@ -906,6 +961,8 @@ export type Database = {
       add_room_xp: { Args: { _pts: number; _room: string }; Returns: undefined }
       add_user_xp: { Args: { _pts: number; _user: string }; Returns: undefined }
       buy_store_item: { Args: { _item: string }; Returns: undefined }
+      claim_activity_chest: { Args: { _tier: number }; Returns: number }
+      claim_daily_checkin: { Args: never; Returns: Json }
       claim_super_admin: { Args: { _pin: string }; Returns: boolean }
       equip_store_item: {
         Args: { _code: string; _kind: string }
@@ -942,6 +999,8 @@ export type Database = {
         Args: { _room_id: string; _user_id: string }
         Returns: boolean
       }
+      my_daily_activity: { Args: never; Returns: Json }
+      riyadh_today: { Args: never; Returns: string }
       send_gift: {
         Args: { _gift_id: string; _receiver_id: string; _room_id: string }
         Returns: {

@@ -22,6 +22,13 @@
       "when": 1791465233496,
       "tag": "0002_vip_store",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791636987562,
+      "tag": "0003_daily_rewards",
+      "breakpoints": true
     }
   ]
 }
