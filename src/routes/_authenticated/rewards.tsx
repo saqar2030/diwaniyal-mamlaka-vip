@@ -2,11 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Lock, Check, Flame } from "lucide-react";
+import { Check, Flame } from "lucide-react";
 import { AppShell } from "@/components/BottomNav";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { DailyCheckInModal, useCheckin } from "@/components/DailyCheckIn";
+import { TreasureChest } from "@/components/TreasureChest";
 
 export const Route = createFileRoute("/_authenticated/rewards")({
   head: () => ({ meta: [{ title: "المهام والجوائز اليومية | ديوانية المملكة" }, { name: "description", content: "سجّل يومياً وأكمل المهام لتربح العملات الذهبية." }] }),
@@ -82,11 +83,11 @@ function RewardsPage() {
               const ready = pts >= c.need && !got;
               return (
                 <button key={tier} disabled={!ready} onClick={() => openChest(tier)}
-                  className={`flex flex-col items-center gap-1 rounded-2xl p-2 ${ready ? "bg-primary/20 animate-pulse" : "bg-secondary"}`}>
-                  <span className="text-3xl">{got ? "📭" : "🧰"}</span>
+                  className={`relative flex flex-col items-center gap-1 rounded-2xl p-2 transition-all ${ready ? "bg-primary/20 shadow-[0_0_18px_hsl(var(--primary)/0.45)] scale-105" : got ? "bg-primary/10" : "bg-secondary"}`}>
+                  <TreasureChest state={got ? "opened" : ready ? "ready" : "locked"} className={`h-12 w-12 ${ready ? "drop-shadow-[0_0_6px_rgba(246,211,101,0.8)]" : ""}`} />
                   <span className="text-[10px] font-black text-primary">+{c.reward}🪙</span>
                   <span className="text-[10px]">🔥{c.need}</span>
-                  {got ? <Check className="h-4 w-4 text-primary" /> : ready ? <span className="text-[9px] font-black">افتح</span> : <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
+                  {got ? <Check className="h-4 w-4 text-primary" /> : ready ? <span className="text-[9px] font-black">افتح</span> : <span className="text-[10px] opacity-50">🔒</span>}
                 </button>
               );
             })}
