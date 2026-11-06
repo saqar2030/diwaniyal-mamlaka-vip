@@ -29,6 +29,13 @@
       "when": 1791636987562,
       "tag": "0003_daily_rewards",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793987250781,
+      "tag": "0004_game_tables",
+      "breakpoints": true
     }
   ]
 }

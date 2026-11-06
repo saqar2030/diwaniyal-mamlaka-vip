@@ -375,6 +375,39 @@ export type Database = {
         }
         Relationships: []
       }
+      game_tables: {
+        Row: {
+          created_at: string
+          game: string
+          host_id: string
+          id: string
+          players: string[]
+          state: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          game?: string
+          host_id: string
+          id?: string
+          players?: string[]
+          state?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          game?: string
+          host_id?: string
+          id?: string
+          players?: string[]
+          state?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gift_events: {
         Row: {
           amount: number
