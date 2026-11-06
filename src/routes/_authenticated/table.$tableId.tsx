@@ -85,7 +85,7 @@ function TablePage() {
     await save({ players: players.filter((p) => p !== user.id) });
   }
   async function start() {
-    if (players.length < 2) return toast.error("تحتاج لاعبين اثنين على الأقل");
+    if (players.length < 2) { toast.error("تحتاج لاعبين اثنين على الأقل"); return; }
     await save({ status: "playing", state: newLudo(players.length) });
   }
   async function doRoll() {
@@ -164,7 +164,7 @@ function TablePage() {
               )}
             </div>
           )}
-          {state.winner == null && state.turn !== seat && <p className="text-center text-xs text-muted-foreground">دور {SEAT_NAMES[state.turn]} ({nameOf(players[state.turn])})</p>}
+          {state.winner == null && state.turn !== seat && <p className="text-center text-xs text-muted-foreground">دور {SEAT_NAMES[state.turn]} ({nameOf(players[state.turn] ?? "")})</p>}
           {state.winner != null && user?.id === table.data.host_id && (
             <button onClick={start} className="mt-2 w-full rounded-xl bg-primary py-2 font-black text-primary-foreground">جولة جديدة</button>
           )}
@@ -195,7 +195,7 @@ function Board({ state }: { state: LudoState }) {
     <svg viewBox="0 0 300 300" className="mx-auto w-full max-w-xs">
       <circle cx={C} cy={C} r={R + 14} fill="hsl(var(--card, 0 0% 10%))" stroke="#c9a227" strokeWidth={2} />
       {Array.from({ length: 52 }, (_, sq) => {
-        const [x, y] = pos(sq);
+        const [x, y] = pos(sq) as [number, number];
         const start = sq % 13 === 0 ? SEAT_COLORS[sq / 13] : null;
         return <circle key={sq} cx={x} cy={y} r={7} fill={start ?? (SAFE.has(sq) ? "#5d4a12" : "#2a2a2a")} stroke="#c9a227" strokeWidth={0.6} />;
       })}
@@ -207,7 +207,7 @@ function Board({ state }: { state: LudoState }) {
           <g key={seat}>
             {toks.map((p, i) => {
               if (p < 0 || p > 50) return null;
-              const [x, y] = pos(absSquare(seat, p));
+              const [x, y] = pos(absSquare(seat, p)) as [number, number];
               return <circle key={i} cx={x + (i % 2) * 3 - 1.5} cy={y + Math.floor(i / 2) * 3 - 1.5} r={5} fill={SEAT_COLORS[seat]} stroke="#fff" strokeWidth={1.5} />;
             })}
             <text x={seat % 2 ? 220 : 80} y={seat < 2 ? 130 : 185} textAnchor="middle" fill={SEAT_COLORS[seat]} fontSize={10} fontWeight="bold">

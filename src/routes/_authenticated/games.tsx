@@ -55,7 +55,7 @@ function LudoLobby() {
   async function create() {
     if (!user) return;
     const { data, error } = await supabase.from("game_tables").insert({ host_id: user.id, players: [user.id] }).select("id").single();
-    if (error || !data) return toast.error("تعذّر إنشاء الطاولة");
+    if (error || !data) { toast.error("تعذّر إنشاء الطاولة"); return; }
     navigate({ to: "/table/$tableId", params: { tableId: data.id } });
   }
   return (
