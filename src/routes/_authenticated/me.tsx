@@ -72,6 +72,7 @@ function MePage() {
 
   // دالة لتحديد لقب العضو بناءً على مستواه الحالي
   function getMemberTitle(lvl: number) {
+    if (profile.data?.display_id === "975998652") return "إدارة ديوانية المملكة 👑";
     if (lvl >= 10) return "شيخ الديوانية 👑";
     if (lvl >= 7) return "مستشار الديوانية ⚜️";
     if (lvl >= 5) return "راعي الفزعة 🔥";
