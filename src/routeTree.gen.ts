@@ -26,6 +26,7 @@ import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as AuthenticatedFamilyFamilyIdRouteImport } from './routes/_authenticated/family.$familyId'
 import { Route as AuthenticatedRoomRoomIdRouteImport } from './routes/_authenticated/room.$roomId'
+import { Route as AuthenticatedTableTableIdRouteImport } from './routes/_authenticated/table.$tableId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -112,6 +113,12 @@ const AuthenticatedRoomRoomIdRoute = AuthenticatedRoomRoomIdRouteImport.update({
   path: '/room/$roomId',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTableTableIdRoute =
+  AuthenticatedTableTableIdRouteImport.update({
+    id: '/table/$tableId',
+    path: '/table/$tableId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/profile/$userId': typeof ProfileUserIdRoute
   '/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
+  '/table/$tableId': typeof AuthenticatedTableTableIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -148,6 +156,7 @@ export interface FileRoutesByTo {
   '/profile/$userId': typeof ProfileUserIdRoute
   '/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
+  '/table/$tableId': typeof AuthenticatedTableTableIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -168,6 +177,7 @@ export interface FileRoutesById {
   '/profile/$userId': typeof ProfileUserIdRoute
   '/_authenticated/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
   '/_authenticated/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
+  '/_authenticated/table/$tableId': typeof AuthenticatedTableTableIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/profile/$userId'
     | '/family/$familyId'
     | '/room/$roomId'
+    | '/table/$tableId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/profile/$userId'
     | '/family/$familyId'
     | '/room/$roomId'
+    | '/table/$tableId'
   id:
     | '__root__'
     | '/'
@@ -225,6 +237,7 @@ export interface FileRouteTypes {
     | '/profile/$userId'
     | '/_authenticated/family/$familyId'
     | '/_authenticated/room/$roomId'
+    | '/_authenticated/table/$tableId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -359,6 +372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRoomRoomIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/table/$tableId': {
+      id: '/_authenticated/table/$tableId'
+      path: '/table/$tableId'
+      fullPath: '/table/$tableId'
+      preLoaderRoute: typeof AuthenticatedTableTableIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -372,6 +392,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedFamilyFamilyIdRoute: typeof AuthenticatedFamilyFamilyIdRoute
   AuthenticatedRoomRoomIdRoute: typeof AuthenticatedRoomRoomIdRoute
+  AuthenticatedTableTableIdRoute: typeof AuthenticatedTableTableIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -384,6 +405,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedFamilyFamilyIdRoute: AuthenticatedFamilyFamilyIdRoute,
   AuthenticatedRoomRoomIdRoute: AuthenticatedRoomRoomIdRoute,
+  AuthenticatedTableTableIdRoute: AuthenticatedTableTableIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
