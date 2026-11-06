@@ -27,7 +27,7 @@ export function canMove(p: number, dice: number) {
 
 export function legalMoves(s: LudoState, seat: number) {
   if (s.dice == null) return [];
-  return s.tokens[seat].map((p, i) => (canMove(p, s.dice!) ? i : -1)).filter((i) => i >= 0);
+  return s.tokens[seat]!.map((p, i) => (canMove(p, s.dice!) ? i : -1)).filter((i) => i >= 0);
 }
 
 const next = (s: LudoState, seat: number) => (seat + 1) % s.tokens.length;
@@ -41,9 +41,9 @@ export function roll(s: LudoState, seat: number, dice: number): LudoState {
 export function move(s: LudoState, seat: number, idx: number): LudoState {
   const dice = s.dice!;
   const tokens = s.tokens.map((t) => [...t]);
-  const p = tokens[seat][idx];
+  const p = tokens[seat]![idx]!;
   const np = p === -1 ? 0 : p + dice;
-  tokens[seat][idx] = np;
+  tokens[seat]![idx] = np;
   let captured = false;
   if (np <= 50) {
     const sq = absSquare(seat, np);
@@ -54,7 +54,7 @@ export function move(s: LudoState, seat: number, idx: number): LudoState {
       });
     }
   }
-  const won = tokens[seat].every((x) => x === FINISH);
+  const won = tokens[seat]!.every((x) => x === FINISH);
   const again = dice === 6 || captured || np === FINISH;
   let log = `${SEAT_NAMES[seat]} حرّك قطعة`;
   if (captured) log += " وأكل قطعة خصم! 💥";
