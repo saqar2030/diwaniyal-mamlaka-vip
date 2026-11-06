@@ -46,7 +46,8 @@ export default function UserLevels() {
 
   const xp = stats.data?.xp ?? 0;
   const needed = level * 100;
-  const pct = Math.min((xp / needed) * 100, 100);
+  const maxed = level >= 100;
+  const pct = maxed ? 100 : Math.min((xp / needed) * 100, 100);
   const msgs = stats.data?.messages ?? 0;
   const power = msgs >= 200 ? "أسطوري" : msgs >= 50 ? "نشط جداً" : msgs >= 10 ? "نشط" : "مبتدئ";
 
@@ -66,7 +67,7 @@ export default function UserLevels() {
       </div>
       <div className="mb-1.5 flex items-center justify-between text-xs">
         <span>المستوى: <b className="text-base text-primary">{level}</b></span>
-        <span className="text-muted-foreground">{xp} / {needed} XP</span>
+        <span className="text-muted-foreground">{maxed ? "👑 أعلى مستوى" : `${xp} / ${needed} XP`}</span>
       </div>
       <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
         <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
