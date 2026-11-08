@@ -873,6 +873,115 @@ export type Database = {
           },
         ]
       }
+      royal_game_states: {
+        Row: {
+          state: Json
+          table_id: string
+        }
+        Insert: {
+          state: Json
+          table_id: string
+        }
+        Update: {
+          state?: Json
+          table_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "royal_game_states_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: true
+            referencedRelation: "royal_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      royal_table_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          table_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          table_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          table_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "royal_table_messages_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "royal_tables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "royal_table_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      royal_tables: {
+        Row: {
+          created_at: string
+          game: string
+          host_id: string
+          id: string
+          players: string[]
+          public_state: Json
+          ready: string[]
+          status: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          game: string
+          host_id: string
+          id?: string
+          players?: string[]
+          public_state?: Json
+          ready?: string[]
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          game?: string
+          host_id?: string
+          id?: string
+          players?: string[]
+          public_state?: Json
+          ready?: string[]
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "royal_tables_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       store_items: {
         Row: {
           code: string
@@ -1034,6 +1143,21 @@ export type Database = {
       }
       my_daily_activity: { Args: never; Returns: Json }
       riyadh_today: { Args: never; Returns: string }
+      royal_commit_state: {
+        Args: {
+          _actor: string
+          _public: Json
+          _state: Json
+          _status: string
+          _table: string
+          _version: number
+        }
+        Returns: boolean
+      }
+      royal_lobby_action: {
+        Args: { _action: string; _game?: string; _table?: string }
+        Returns: string
+      }
       send_gift: {
         Args: { _gift_id: string; _receiver_id: string; _room_id: string }
         Returns: {

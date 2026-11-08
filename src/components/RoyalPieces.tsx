@@ -1,0 +1,5 @@
+import { SUIT_SYMBOL,type Card,type Piece } from '@/lib/royal-games';
+export function PlayingCard({card}:{card:Card}){return <span className={`royal-playing-card ${card.suit==='H'||card.suit==='D'?'royal-red-card':''}`}><span className="royal-card-corner">{card.rank}<small>{SUIT_SYMBOL[card.suit]}</small></span><span className="royal-card-suit">{SUIT_SYMBOL[card.suit]}</span><span className="royal-card-corner royal-card-bottom">{card.rank}<small>{SUIT_SYMBOL[card.suit]}</small></span></span>;}
+const dots:Record<number,number[]>={0:[],1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function Pips({value}:{value:number}){return <span className="royal-pips">{Array.from({length:9},(_,i)=><i key={i} className={dots[value]?.includes(i)?'royal-pip-visible':''}/>)}</span>;}
+export function DominoPiece({piece,horizontal=false}:{piece:Piece;horizontal?:boolean}){return <span className={`royal-domino ${horizontal?'royal-domino-horizontal':''}`}><Pips value={piece.a}/><span className="royal-domino-divider"/><Pips value={piece.b}/></span>;}

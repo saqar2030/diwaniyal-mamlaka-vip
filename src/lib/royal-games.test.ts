@@ -1,0 +1,12 @@
+import { describe,it,expect } from 'vitest';
+import {newRoyal,dominoDeck,cardDeck,applyRoyal,publicRoyal,legalCards,trickWinner,cardPoints,type RoyalState} from './royal-games';
+describe('four-player games',()=>{
+ it('deals 28 unique dominoes, seven per each of four seats',()=>{const s=newRoyal('domino');expect(s.hands.map(h=>h.length)).toEqual([7,7,7,7]);expect(new Set(s.hands.flat().map(p=>p.id)).size).toBe(28);expect(dominoDeck()).toHaveLength(28);});
+ it('deals 32 unique Baloot cards, eight per each of four seats after buying',()=>{const s=newRoyal('baloot');const n=applyRoyal(s,s.turn,{type:'bid',mode:'sun'});expect(n.hands.map(h=>h.length)).toEqual([8,8,8,8]);expect(new Set(n.hands.flat().map(p=>p.id)).size).toBe(32);expect(cardDeck()).toHaveLength(32);});
+ it('never publishes private hands or undealt cards',()=>{const p=publicRoyal(newRoyal('baloot'));expect('hands'in p).toBe(false);expect('stock'in p).toBe(false);expect(p.counts).toEqual([5,5,5,5]);});
+ it('rejects wrong turn',()=>{const s=newRoyal('domino');expect(()=>applyRoyal(s,(s.turn+1)%4,{type:'pass'})).toThrow('ليس دورك');});
+ it('forces double six opening and disallows pass with a playable tile',()=>{const s=newRoyal('domino');expect(()=>applyRoyal(s,s.turn,{type:'pass'})).toThrow();const n=applyRoyal(s,s.turn,{type:'play',id:'6-6',end:'right'});expect(n.board[0]?.id).toBe('6-6');expect(n.turn).toBe((s.turn+1)%4);});
+ it('follows suit and ranks trump Jack above Ace with 20 points',()=>{const s=newRoyal('baloot');s.phase='play';s.trump='H';s.hands[1]=[{id:'SA',suit:'S',rank:'A'},{id:'HJ',suit:'H',rank:'J'}];s.trick=[{seat:0,card:{id:'S7',suit:'S',rank:'7'}}];expect(legalCards(s,1)).toEqual(['SA']);expect(trickWinner([{seat:0,card:{id:'HA',suit:'H',rank:'A'}},{seat:1,card:{id:'HJ',suit:'H',rank:'J'}}],'H')?.seat).toBe(1);expect(cardPoints({id:'HJ',suit:'H',rank:'J'},'H')).toBe(20);});
+ it('scores a blocked domino round by partnership pip totals',()=>{const s=newRoyal('domino');s.opening=null;s.board=[{id:'6-6',a:6,b:6}];s.hands=[[{id:'0-0',a:0,b:0}],[{id:'1-1',a:1,b:1}],[{id:'0-1',a:0,b:1}],[{id:'2-2',a:2,b:2}]];s.turn=0;let n:RoyalState=s;for(let i=0;i<4;i++)n=applyRoyal(n,n.turn,{type:'pass'});expect(n.phase).toBe('round');expect(n.scores).toEqual([6,0]);});
+ it('rejects mismatched domino endpoint',()=>{const s=newRoyal('domino');s.opening=null;s.board=[{id:'6-6',a:6,b:6}];s.hands[s.turn]=[{id:'1-2',a:1,b:2}];expect(()=>applyRoyal(s,s.turn,{type:'play',id:'1-2',end:'right'})).toThrow();});
+});
