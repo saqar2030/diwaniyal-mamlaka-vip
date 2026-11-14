@@ -11,6 +11,7 @@ import CarromGame from "@/components/CarromGame";
 import DominoGame from "@/components/DominoGame";
 import LudoGame from "@/components/LudoGame";
 import UnoGame from "@/components/UnoGame";
+import { RoyalGameLobby } from "@/components/RoyalGameLobby";
 
 export const Route = createFileRoute("/_authenticated/games")({
   head: () => ({
@@ -19,16 +20,16 @@ export const Route = createFileRoute("/_authenticated/games")({
       { name: "description", content: "العب بلوت، لودو، كيرم، دومينو وأونو مع أهل الديوانية." },
       { property: "og:title", content: "صالة الألعاب | ديوانية المملكة" },
       { property: "og:description", content: "ألعاب جماعية داخل ديوانية المملكة." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: GamesPage,
 });
 
 const games = [
-  { id: "baloot", name: "بلوت سعودي", C: BalootGame },
   { id: "ludo", name: "لودو المملكة", C: LudoGame },
   { id: "carrom", name: "كيرم خشب", C: CarromGame },
-  { id: "domino", name: "دومينو", C: DominoGame },
   { id: "basra", name: "بصرة", C: BasraGame },
   { id: "uno", name: "أونو", C: UnoGame },
 ] as const;
@@ -85,6 +86,7 @@ function GamesPage() {
   const Current = games.find((g) => g.id === active)?.C ?? BalootGame;
   return (
     <AppShell title="صالة الألعاب">
+      <RoyalGameLobby />
       <LudoLobby />
       <p className="px-4 text-xs text-muted-foreground">ألعاب فردية ضد الكمبيوتر:</p>
       <div className="flex gap-2 overflow-x-auto px-4 py-3">

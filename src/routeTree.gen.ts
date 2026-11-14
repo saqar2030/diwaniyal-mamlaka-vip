@@ -25,6 +25,7 @@ import { Route as AuthenticatedStoreRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as AuthenticatedFamilyFamilyIdRouteImport } from './routes/_authenticated/family.$familyId'
+import { Route as AuthenticatedPlayGameIdRouteImport } from './routes/_authenticated/play.$gameId'
 import { Route as AuthenticatedRoomRoomIdRouteImport } from './routes/_authenticated/room.$roomId'
 import { Route as AuthenticatedTableTableIdRouteImport } from './routes/_authenticated/table.$tableId'
 
@@ -108,6 +109,11 @@ const AuthenticatedFamilyFamilyIdRoute =
     path: '/family/$familyId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPlayGameIdRoute = AuthenticatedPlayGameIdRouteImport.update({
+  id: '/play/$gameId',
+  path: '/play/$gameId',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRoomRoomIdRoute = AuthenticatedRoomRoomIdRouteImport.update({
   id: '/room/$roomId',
   path: '/room/$roomId',
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
+  '/play/$gameId': typeof AuthenticatedPlayGameIdRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
   '/table/$tableId': typeof AuthenticatedTableTableIdRoute
 }
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
+  '/play/$gameId': typeof AuthenticatedPlayGameIdRoute
   '/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
   '/table/$tableId': typeof AuthenticatedTableTableIdRoute
 }
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/_authenticated/family/$familyId': typeof AuthenticatedFamilyFamilyIdRoute
+  '/_authenticated/play/$gameId': typeof AuthenticatedPlayGameIdRoute
   '/_authenticated/room/$roomId': typeof AuthenticatedRoomRoomIdRoute
   '/_authenticated/table/$tableId': typeof AuthenticatedTableTableIdRoute
 }
@@ -197,6 +206,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/profile/$userId'
     | '/family/$familyId'
+    | '/play/$gameId'
     | '/room/$roomId'
     | '/table/$tableId'
   fileRoutesByTo: FileRoutesByTo
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/profile/$userId'
     | '/family/$familyId'
+    | '/play/$gameId'
     | '/room/$roomId'
     | '/table/$tableId'
   id:
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wallet'
     | '/profile/$userId'
     | '/_authenticated/family/$familyId'
+    | '/_authenticated/play/$gameId'
     | '/_authenticated/room/$roomId'
     | '/_authenticated/table/$tableId'
   fileRoutesById: FileRoutesById
@@ -365,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFamilyFamilyIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/play/$gameId': {
+      id: '/_authenticated/play/$gameId'
+      path: '/play/$gameId'
+      fullPath: '/play/$gameId'
+      preLoaderRoute: typeof AuthenticatedPlayGameIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/room/$roomId': {
       id: '/_authenticated/room/$roomId'
       path: '/room/$roomId'
@@ -391,6 +410,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedStoreRoute: typeof AuthenticatedStoreRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedFamilyFamilyIdRoute: typeof AuthenticatedFamilyFamilyIdRoute
+  AuthenticatedPlayGameIdRoute: typeof AuthenticatedPlayGameIdRoute
   AuthenticatedRoomRoomIdRoute: typeof AuthenticatedRoomRoomIdRoute
   AuthenticatedTableTableIdRoute: typeof AuthenticatedTableTableIdRoute
 }
@@ -404,6 +424,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedStoreRoute: AuthenticatedStoreRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedFamilyFamilyIdRoute: AuthenticatedFamilyFamilyIdRoute,
+  AuthenticatedPlayGameIdRoute: AuthenticatedPlayGameIdRoute,
   AuthenticatedRoomRoomIdRoute: AuthenticatedRoomRoomIdRoute,
   AuthenticatedTableTableIdRoute: AuthenticatedTableTableIdRoute,
 }

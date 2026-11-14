@@ -14,7 +14,7 @@ export type RoyalState = {
   mode: 'sun'|'hokum'|null; trump: Suit|null; buyer: number|null;
   winner: number|null; log: string;
 };
-export type GameAction = { type:'bid'|'play'|'pass'|'next'; id?:string; mode?:'sun'|'hokum'; suit?:Suit; end?:'left'|'right' };
+export type GameAction = { type:'bid'|'play'|'pass'|'next'; id?:string|undefined; mode?:'sun'|'hokum'|undefined; suit?:Suit|undefined; end?:'left'|'right'|undefined };
 export type PublicState = Omit<RoyalState,'hands'|'stock'> & { counts:number[] };
 export function shuffle<T>(values: T[]): T[] {
  const out=[...values]; for(let i=out.length-1;i>0;i--){const n=new Uint32Array(1);crypto.getRandomValues(n);const j=(n[0] ?? 0)%(i+1);const a=out[i],b=out[j];if(a!==undefined&&b!==undefined){out[i]=b;out[j]=a;}}return out;

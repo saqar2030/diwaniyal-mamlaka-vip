@@ -25,7 +25,7 @@ export const actRoyalTable=createServerFn({method:'POST'}).middleware([requireSu
  if(data.action.type==='next'&&t.host_id!==context.userId)throw Error('صاحب الطاولة يبدأ الجولة');
  const {supabaseAdmin}=await import('@/integrations/supabase/client.server');let state:RoyalState;
  if(data.action.type==='start')state=newRoyal(t.game==='baloot'?'baloot':'domino');
- else {const {data:p,error:e}=await supabaseAdmin.from('royal_game_states').select('state').eq('table_id',data.id).single();if(e)throw Error('تعذر قراءة الجولة');state=applyRoyal(p.state as unknown as RoyalState,seat,data.action);}
+ else {const {data:p,error:e}=await supabaseAdmin.from('royal_game_states').select('state').eq('table_id',data.id).single();if(e)throw Error('تعذر قراءة الجولة');state=applyRoyal(p.state as unknown as RoyalState,seat,{...data.action,type:data.action.type});}
  const {data:ok,error:commitError}=await supabaseAdmin.rpc('royal_commit_state',{_table:t.id,_version:t.version,_actor:context.userId,_state:JSON.parse(JSON.stringify(state)),_public:JSON.parse(JSON.stringify(publicRoyal(state))),_status:state.phase==='done'?'done':'playing'});
  if(commitError||!ok)throw Error('تغيرت الطاولة، حاول مجددًا');return {ok:true};
 });
