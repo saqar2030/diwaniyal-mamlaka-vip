@@ -9,6 +9,7 @@ import { formatCoins } from "@/lib/queries";
 import { Lock, Trash2, EyeOff, Eye, Ban, Coins, KeyRound } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  head: () => ({ meta: [{ title: "الإدارة العليا | ديوانية المملكة" }, { name: "description", content: "إدارة أعضاء وغرف وقروبات ديوانية المملكة." }, { property: "og:title", content: "الإدارة العليا | ديوانية المملكة" }, { property: "og:description", content: "إدارة أعضاء وغرف وقروبات ديوانية المملكة." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: AdminPage,
 });
 

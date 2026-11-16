@@ -8,6 +8,7 @@ import { fetchProfile, formatCoins } from "@/lib/queries";
 import { Coins } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
+  head: () => ({ meta: [{ title: "محفظة العملات | ديوانية المملكة" }, { name: "description", content: "رصيد العملات وباقات الشحن في ديوانية المملكة." }, { property: "og:title", content: "محفظة العملات | ديوانية المملكة" }, { property: "og:description", content: "رصيد العملات وباقات الشحن في ديوانية المملكة." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: WalletPage,
 });
 

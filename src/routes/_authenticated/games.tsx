@@ -8,7 +8,6 @@ import { AppShell } from "@/components/BottomNav";
 import BalootGame from "@/components/BalootGame";
 import BasraGame from "@/components/BasraGame";
 import CarromGame from "@/components/CarromGame";
-import DominoGame from "@/components/DominoGame";
 import LudoGame from "@/components/LudoGame";
 import UnoGame from "@/components/UnoGame";
 import { RoyalGameLobby } from "@/components/RoyalGameLobby";

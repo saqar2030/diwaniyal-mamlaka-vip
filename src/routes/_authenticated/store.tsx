@@ -9,7 +9,7 @@ import { formatCoins } from "@/lib/queries";
 import { FramedAvatar, ENTRIES, VipBadge } from "@/components/Vip";
 
 export const Route = createFileRoute("/_authenticated/store")({
-  head: () => ({ meta: [{ title: "متجر VIP الملكي | ديوانية المملكة" }, { name: "description", content: "عضويات VIP وإطارات ودخوليات مميزة للغرف." }] }),
+  head: () => ({ meta: [{ title: "متجر VIP الملكي | ديوانية المملكة" }, { name: "description", content: "عضويات VIP وإطارات ودخوليات مميزة للغرف." }, { property: "og:title", content: "متجر VIP الملكي | ديوانية المملكة" }, { property: "og:description", content: "عضويات VIP وإطارات ودخوليات مميزة للغرف." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: StorePage,
 });
 

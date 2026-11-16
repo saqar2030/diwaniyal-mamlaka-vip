@@ -12,6 +12,8 @@ import ChatGames from "@/components/ChatGames";
 export const Route = createFileRoute("/feed")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "مجتمع ديوانية المملكة" },
       { name: "description", content: "شارك منشوراتك وصورك وفيديوهاتك وتفاعل مع أعضاء ديوانية المملكة." },
       { property: "og:title", content: "مجتمع ديوانية المملكة" },

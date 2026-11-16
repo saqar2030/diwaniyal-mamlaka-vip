@@ -10,6 +10,7 @@ import { uploadMedia, extOf } from "@/lib/upload";
 import { Coins, LogOut, Camera, Trophy, Search, Shield, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/me")({
+  head: () => ({ meta: [{ title: "حسابي | ديوانية المملكة" }, { name: "description", content: "ملفك الشخصي وعضويتك في ديوانية المملكة." }, { property: "og:title", content: "حسابي | ديوانية المملكة" }, { property: "og:description", content: "ملفك الشخصي وعضويتك في ديوانية المملكة." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: MePage,
 });
 

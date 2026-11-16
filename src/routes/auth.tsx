@@ -7,6 +7,8 @@ import { lovable } from "@/integrations/lovable/index";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "الدخول إلى ديوانية المملكة" },
       { name: "description", content: "سجّل دخولك أو أنشئ حسابك للانضمام إلى الغرف الصوتية." },
       { property: "og:title", content: "الدخول إلى ديوانية المملكة" },

@@ -11,6 +11,8 @@ import { absSquare, FINISH, legalMoves, move, newLudo, roll, SAFE, SEAT_COLORS, 
 export const Route = createFileRoute("/_authenticated/table/$tableId")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "طاولة لودو | ديوانية المملكة" },
       { name: "description", content: "طاولة لودو جماعية لأربعة لاعبين مع دردشة وصوت مباشر." },
       { property: "og:title", content: "طاولة لودو | ديوانية المملكة" },

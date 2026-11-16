@@ -11,6 +11,7 @@ import { RoomSettings, type RoomRow } from "@/components/RoomSettings";
 import { ArrowRight, Gift, Mic, MicOff, Send, LogOut, Settings, Lock, Ban, VolumeX, Volume2, User, Coins, Video, VideoOff } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/room/$roomId")({
+  head: () => ({ meta: [{ title: "الغرفة الصوتية | ديوانية المملكة" }, { name: "description", content: "السوالف والصوت والهدايا في غرف ديوانية المملكة." }, { property: "og:title", content: "الغرفة الصوتية | ديوانية المملكة" }, { property: "og:description", content: "السوالف والصوت والهدايا في غرف ديوانية المملكة." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: RoomPage,
 });
 

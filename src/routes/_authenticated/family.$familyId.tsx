@@ -9,6 +9,7 @@ import { FamilySettings } from "@/components/FamilySettings";
 import { ArrowRight, Check, X, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/family/$familyId")({
+  head: () => ({ meta: [{ title: "دردشة القروب | ديوانية المملكة" }, { name: "description", content: "دردشة ومشاركة أعضاء قروبات ديوانية المملكة." }, { property: "og:title", content: "دردشة القروب | ديوانية المملكة" }, { property: "og:description", content: "دردشة ومشاركة أعضاء قروبات ديوانية المملكة." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: FamilyChatPage,
 });
 

@@ -10,7 +10,7 @@ import { DailyCheckInModal, useCheckin } from "@/components/DailyCheckIn";
 import { TreasureChest } from "@/components/TreasureChest";
 
 export const Route = createFileRoute("/_authenticated/rewards")({
-  head: () => ({ meta: [{ title: "المهام والجوائز اليومية | ديوانية المملكة" }, { name: "description", content: "سجّل يومياً وأكمل المهام لتربح العملات الذهبية." }] }),
+  head: () => ({ meta: [{ title: "المهام والجوائز اليومية | ديوانية المملكة" }, { name: "description", content: "سجّل يومياً وأكمل المهام لتربح العملات الذهبية." }, { property: "og:title", content: "المهام والجوائز اليومية | ديوانية المملكة" }, { property: "og:description", content: "سجّل يومياً وأكمل المهام لتربح العملات الذهبية." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: RewardsPage,
 });
 

@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ChatComposer, MessageBody, type OutgoingMessage } from "@/components/ChatComposer";
 
 export const Route = createFileRoute("/_authenticated/messages")({
+  head: () => ({ meta: [{ title: "الرسائل الخاصة | ديوانية المملكة" }, { name: "description", content: "محادثاتك الخاصة مع أعضاء ديوانية المملكة." }, { property: "og:title", content: "الرسائل الخاصة | ديوانية المملكة" }, { property: "og:description", content: "محادثاتك الخاصة مع أعضاء ديوانية المملكة." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   validateSearch: (s: Record<string, unknown>) => ({ to: typeof s['to'] === "string" ? (s['to'] as string) : undefined }),
   component: MessagesPage,
 });
