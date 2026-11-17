@@ -1,4 +1,5 @@
-export type GameKind = 'baloot' | 'domino';
+import { setupExtra, applyExtra, type ExtraState } from './royal-extra-games';
+export type GameKind = 'baloot' | 'domino' | 'carrom' | 'basra' | 'uno' | 'snake' | 'billiards' | 'chess';
 export type Suit = 'S' | 'H' | 'D' | 'C';
 export const SUITS: Suit[] = ['S','H','D','C'];
 export const SUIT_SYMBOL: Record<Suit,string> = { S:'♠', H:'♥', D:'♦', C:'♣' };
@@ -12,9 +13,9 @@ export type RoyalState = {
   trick: Played[]; lastTrick: Played[]; tricks: number[];
   bidRound: number; bidPasses: number; exposed: Card|null; stock: Card[];
   mode: 'sun'|'hokum'|null; trump: Suit|null; buyer: number|null;
-  winner: number|null; log: string;
+  winner: number|null; log: string; extra?:ExtraState;
 };
-export type GameAction = { type:'bid'|'play'|'pass'|'next'; id?:string|undefined; mode?:'sun'|'hokum'|undefined; suit?:Suit|undefined; end?:'left'|'right'|undefined };
+export type GameAction = { type:'bid'|'play'|'pass'|'next'|'draw'|'roll'|'chess'|'shot'; id?:string|undefined; mode?:'sun'|'hokum'|undefined; suit?:Suit|undefined; end?:'left'|'right'|undefined; color?:Suit|undefined; from?:string|undefined; to?:string|undefined; promotion?:string|undefined; angle?:number|undefined; power?:number|undefined; position?:number|undefined; x?:number|undefined; y?:number|undefined; dice?:number };
 export type PublicState = Omit<RoyalState,'hands'|'stock'> & { counts:number[] };
 export function shuffle<T>(values: T[]): T[] {
  const out=[...values]; for(let i=out.length-1;i>0;i--){const n=new Uint32Array(1);crypto.getRandomValues(n);const j=(n[0] ?? 0)%(i+1);const a=out[i],b=out[j];if(a!==undefined&&b!==undefined){out[i]=b;out[j]=a;}}return out;
@@ -26,7 +27,7 @@ export function newRoyal(game:GameKind, scores=[0,0], round=1, dealer=3): RoyalS
  if(game==='domino'){const deck=shuffle(dominoDeck());base.hands=Array.from({length:4},(_,i)=>deck.slice(i*7,i*7+7));if(round===1){base.opening='6-6';base.turn=base.hands.findIndex(h=>h.some(p=>p.id==='6-6'));}base.log='دور اللاعب '+(base.turn+1);}
  else {const deck=shuffle(cardDeck());base.hands=Array.from({length:4},(_,i)=>deck.slice(i*5,i*5+5));base.exposed=deck[20] ?? null;base.stock=deck.slice(21);base.log='الشراء — صن أو حكم أو بس';}return base;
 }
-export function publicRoyal(s:RoyalState):PublicState {const {hands,stock,...rest}=s;void stock;return {...rest,counts:hands.map(h=>h.length)};}
+export function publicRoyal(s:RoyalState):PublicState {const {hands,stock,...rest}=s;void stock;return {...rest,...(rest.extra?{extra:{...rest.extra,drawn:null}}:{}),counts:hands.map(h=>h.length)};}
 export function rankValue(c:Card,trump:Suit|null):number {return (c.suit===trump?['7','8','Q','K','10','A','9','J']:['7','8','9','J','Q','K','10','A']).indexOf(c.rank);}
 export function cardPoints(c:Card,trump:Suit|null):number {if(c.suit===trump&&c.rank==='J')return 20;if(c.suit===trump&&c.rank==='9')return 14;return ({A:11,'10':10,K:4,Q:3,J:2} as Record<string,number>)[c.rank]??0;}
 export function trickWinner(trick:Played[],trump:Suit|null):Played|undefined {let win=trick[0];for(const p of trick.slice(1)){if(!win)break;if(p.card.suit===win.card.suit?rankValue(p.card,trump)>rankValue(win.card,trump):p.card.suit===trump)win=p;}return win;}

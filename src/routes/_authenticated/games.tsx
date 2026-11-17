@@ -87,7 +87,7 @@ function GamesPage() {
     <AppShell title="صالة الألعاب">
       <RoyalGameLobby />
       <LudoLobby />
-      <p className="px-4 text-xs text-muted-foreground">ألعاب فردية ضد الكمبيوتر:</p>
+      <details className="px-4"><summary className="cursor-pointer text-xs text-muted-foreground">تدريب فردي ضد الكمبيوتر</summary>
       <div className="flex gap-2 overflow-x-auto px-4 py-3">
         {games.map((g) => (
           <button
@@ -101,7 +101,7 @@ function GamesPage() {
       </div>
       <div className="px-2">
         <Current />
-      </div>
+      </div></details>
     </AppShell>
   );
 }

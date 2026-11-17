@@ -1,6 +1,6 @@
 import Matter from 'matter-js';
 export type Ball = { id: number; x: number; y: number; kind: 'white'|'black'|'queen'|'cue'|'solid'|'stripe'|'eight' };
-export type Shot = { angle: number; power: number; position?: number };
+export type Shot = { angle: number; power: number; position?: number|undefined };
 export function rack(game: 'carrom'|'billiards'): Ball[] {
  if(game==='billiards')return [{id:0,x:25,y:50,kind:'cue'},...Array.from({length:15},(_,i)=>{let row=0;while(i>=(row+1)*(row+2)/2)row++;const col=i-row*(row+1)/2;const number=[1,9,2,10,8,3,11,4,12,5,13,6,14,7,15][i]??i+1;return {id:number,x:67+row*3.6,y:50+(col-row/2)*4.2,kind:number===8?'eight' as const:number<8?'solid' as const:'stripe' as const};})];
  const coins:Ball[]=[{id:19,x:50,y:50,kind:'queen'}];
