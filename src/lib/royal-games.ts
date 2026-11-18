@@ -15,7 +15,7 @@ export type RoyalState = {
   mode: 'sun'|'hokum'|null; trump: Suit|null; buyer: number|null;
   winner: number|null; log: string; extra?:ExtraState;
 };
-export type GameAction = { type:'bid'|'play'|'pass'|'next'|'draw'|'roll'|'chess'|'shot'; id?:string|undefined; mode?:'sun'|'hokum'|undefined; suit?:Suit|undefined; end?:'left'|'right'|undefined; color?:Suit|undefined; from?:string|undefined; to?:string|undefined; promotion?:string|undefined; angle?:number|undefined; power?:number|undefined; position?:number|undefined; x?:number|undefined; y?:number|undefined; dice?:number };
+export type GameAction = { type:'bid'|'play'|'pass'|'next'|'draw'|'roll'|'chess'|'shot'; id?:string|undefined; mode?:'sun'|'hokum'|undefined; suit?:Suit|undefined; end?:'left'|'right'|undefined; color?:Suit|undefined; from?:string|undefined; to?:string|undefined; promotion?:string|undefined; angle?:number|undefined; power?:number|undefined; position?:number|undefined; x?:number|undefined; y?:number|undefined; dice?:number|undefined };
 export type PublicState = Omit<RoyalState,'hands'|'stock'> & { counts:number[] };
 export function shuffle<T>(values: T[]): T[] {
  const out=[...values]; for(let i=out.length-1;i>0;i--){const n=new Uint32Array(1);crypto.getRandomValues(n);const j=(n[0] ?? 0)%(i+1);const a=out[i],b=out[j];if(a!==undefined&&b!==undefined){out[i]=b;out[j]=a;}}return out;
@@ -24,6 +24,7 @@ export const cardDeck = ():Card[] => SUITS.flatMap(suit=>['7','8','9','J','Q','K
 export const dominoDeck = ():Piece[] => Array.from({length:7},(_,a)=>Array.from({length:7-a},(_,i)=>({id:`${a}-${a+i}`,a,b:a+i}))).flat();
 export function newRoyal(game:GameKind, scores=[0,0], round=1, dealer=3): RoyalState {
  const base:RoyalState={game,phase:game==='baloot'?'bid':'play',turn:(dealer+1)%4,dealer,hands:[[],[],[],[]],scores,raw:[0,0],round,board:[],passes:0,opening:null,trick:[],lastTrick:[],tricks:[0,0],bidRound:1,bidPasses:0,exposed:null,stock:[],mode:null,trump:null,buyer:null,winner:null,log:'بدأت الجولة'};
+ if(game!=='baloot'&&game!=='domino')return setupExtra(base);
  if(game==='domino'){const deck=shuffle(dominoDeck());base.hands=Array.from({length:4},(_,i)=>deck.slice(i*7,i*7+7));if(round===1){base.opening='6-6';base.turn=base.hands.findIndex(h=>h.some(p=>p.id==='6-6'));}base.log='دور اللاعب '+(base.turn+1);}
  else {const deck=shuffle(cardDeck());base.hands=Array.from({length:4},(_,i)=>deck.slice(i*5,i*5+5));base.exposed=deck[20] ?? null;base.stock=deck.slice(21);base.log='الشراء — صن أو حكم أو بس';}return base;
 }
@@ -46,6 +47,7 @@ export function applyRoyal(input:RoyalState,seat:number,a:GameAction):RoyalState
  const s=structuredClone(input);if(a.type==='next'){if(s.phase!=='round')throw Error('الجولة لم تنتهِ');return newRoyal(s.game,s.scores,s.round+1,(s.dealer+1)%4);}
  if(s.phase==='round'||s.phase==='done'||s.turn!==seat)throw Error('ليس دورك');
  const hand=s.hands[seat];if(!hand)throw Error('مقعد غير صالح');
+ if(s.game!=='baloot'&&s.game!=='domino')return applyExtra(s,seat,a);
  if(s.game==='domino'){
  const tiles=hand.filter((p):p is Piece=>'a'in p);
  if(a.type==='pass'){if(tiles.some(p=>dominoEnds(s,p).length))throw Error('لديك قطعة قابلة للعب');s.passes++;if(s.passes===4){const total=[0,0];s.hands.forEach((h,i)=>{total[i%2]=(total[i%2]??0)+h.reduce((v,p)=>v+('a'in p?p.a+p.b:0),0);});finishDomino(s,total[0]===total[1]?null:(total[0]??0)<(total[1]??0)?0:1);}else{s.turn=(seat+1)%4;s.log=`اللاعب ${seat+1} مرّر الدور`;}return s;}
